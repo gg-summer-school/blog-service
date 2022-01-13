@@ -1,5 +1,5 @@
 package net.gogroups.blogservices.model;
 
-public enum Role {
+public enum ERole {
     READER, ADMIN, PUBLISHER
 }
