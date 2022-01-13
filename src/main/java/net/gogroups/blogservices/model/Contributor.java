@@ -15,11 +15,12 @@ import java.util.List;
 @Entity
 public class Contributor {
     @Id
-    private Long id;
+    @Column(length = 50)
+    private String id;
     private String name;
 
     @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "contributor_article",
+    @JoinTable(name = "article_contributor",
             joinColumns = @JoinColumn(name = "article_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "contributor_id",
                     referencedColumnName = "id"))

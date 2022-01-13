@@ -14,15 +14,16 @@ import javax.persistence.*;
 @Entity
 public class Transaction {
     @Id
-    private Long id;
+    @Column(length = 50)
+    private String id;
     private String name;
     private String paymentDate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_id")
     private Article article;
 
