@@ -38,17 +38,17 @@ public class SwaggerConfiguration {
 //    private ApiKey apiKey() {
 //        return new ApiKey("JWT", AUTHORIZATION_HEADER, "header");
 //    }
-    @Configuration
-    public class SpringFoxConfig {
-        @Bean
-        public Docket api() {
-            return new Docket(DocumentationType.SWAGGER_2)
-                    .select()
-                    .apis(RequestHandlerSelectors.basePackage("net.gogroups.blogservices"))
-                    .paths(PathSelectors.any())
-                    .build();
-        }
-    }
+//    @Configuration
+//    public class SpringFoxConfig {
+//        @Bean
+//        public Docket api() {
+//            return new Docket(DocumentationType.SWAGGER_2)
+//                    .select()
+//                    .apis(RequestHandlerSelectors.basePackage("net.gogroups.blogservices"))
+//                    .paths(PathSelectors.any())
+//                    .build();
+//        }
+//    }
 
 //    @Bean
 //    public Docket api() {
