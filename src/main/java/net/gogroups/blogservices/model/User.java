@@ -16,7 +16,8 @@ import java.util.List;
 public class User {
 
     @Id
-    private Long id;
+    @Column(length = 50)
+    private String id;
     private String name;
     private String email;
     private String password;
@@ -24,12 +25,16 @@ public class User {
     private boolean isApproved;
 
     @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "user_role",
+            joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id",
+                    referencedColumnName = "id"))
     private List<Role> role;
 
-    @OneToMany
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Transaction> transactions;
 
-    @OneToMany
+    @OneToMany(mappedBy = "user", cascade =  CascadeType.ALL)
     private List<Article> articles;
 
 

@@ -15,9 +15,10 @@ import java.util.List;
 @Entity
 public class Category {
     @Id
-    private Long id;
+    @Column(length = 50)
+    private String id;
     private String name;
 
-    @OneToMany
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private List<Article> articles;
 }

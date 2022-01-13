@@ -17,7 +17,8 @@ import java.util.List;
 public class Article {
 
     @Id
-    private Long id;
+    @Column(length = 50)
+    private String id;
     private String title;
     private String articleAbstract;
     private String toc;
@@ -25,18 +26,18 @@ public class Article {
     private String document;
     private BigDecimal price;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "article")
     private List<Contributor> contributor;
 
-    @OneToMany
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     private List<Transaction> transaction;
 
 
