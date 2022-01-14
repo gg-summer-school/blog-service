@@ -10,7 +10,8 @@ public class BlogServicesApplication {
 
 	@Bean
 	public ModelMapper modelMapper(){
-		return new ModelMapper();
+		ModelMapper modelMapper = new ModelMapper();
+		return modelMapper;
 	}
 	public static void main(String[] args) {
 		SpringApplication.run(BlogServicesApplication.class, args);

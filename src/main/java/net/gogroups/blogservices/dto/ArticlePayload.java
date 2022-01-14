@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -28,6 +29,7 @@ public class ArticlePayload {
     private String toc;
 
     @NotNull
+    @DecimalMin(value = "1.0")
     private BigDecimal price;
 
 
