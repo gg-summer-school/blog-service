@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.util.Date;
@@ -45,6 +46,14 @@ public class ArticleController {
     //@PreAuthorize("hasRole('PUBLISHER')")
     public ResponseEntity<?> uploadFile(@PathVariable String articleId, @PathVariable String publisherId, MultipartFile coverPage, MultipartFile document){
         this.articleService.uploadArticleWithCoverPageImage(articleId, coverPage, document);
+        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/downloadFile/")
+                .path(document.getOriginalFilename())
+                .toUriString();
+        String coverPageDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/downloadFile/")
+                .path(coverPage.getOriginalFilename())
+                .toUriString();
         return new ResponseEntity<>(new SuccessResponse("Files uploaded successfully",  new Date()), HttpStatus.OK);
     }
 
@@ -60,14 +69,14 @@ public class ArticleController {
     }
 
     @DeleteMapping("protected/publishers/{publisherId}/articles/{articleId}/categories/{categoryId}")
-    @PreAuthorize("hasRole('PUBLISHER')")
+    //@PreAuthorize("hasRole('PUBLISHER')")
     public ResponseEntity<?> deleteArticle(@PathVariable String articleId, @PathVariable  String categoryId, @PathVariable  String publisherId){
         this.articleService.deleteArticle(articleId, categoryId, publisherId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("public/articles")
-    @PreAuthorize("hasRole('PUBLISHER') or hasRole('ADMIN') or hasRole('READER')")
+    //@PreAuthorize("hasRole('PUBLISHER') or hasRole('ADMIN') or hasRole('READER')")
     public ResponseEntity<List<ArticleDto>> getAllArticles(){
         List<Article> articles = this.articleService.getAllArticles();
         List<ArticleDto> articleDtos =  articles.stream().map((article -> this.modelMapper.map(article,ArticleDto.class))).collect(Collectors.toList());
@@ -75,7 +84,7 @@ public class ArticleController {
     }
 
     @GetMapping("protected/publishers/{publisherId}/articles")
-    @PreAuthorize("hasRole('PUBLISHER')")
+    //@PreAuthorize("hasRole('PUBLISHER')")
     public ResponseEntity<List<ArticleDto>> getAllArticlesByPublisher(String publisherId){
         List<Article> articles = this.articleService.getAllArticlesByPublisher(publisherId);
         List<ArticleDto> articleDtos = articles.stream().map((article -> this.modelMapper.map(article, ArticleDto.class))).collect(Collectors.toList());
@@ -83,7 +92,7 @@ public class ArticleController {
     }
 
     @GetMapping("protected/publisher/{publisherId}/articles/{articleId}/categories/{categoryId}")
-    @PreAuthorize("hasRole('PUBLISHER')")
+    //@PreAuthorize("hasRole('PUBLISHER')")
     public ResponseEntity<ArticleDto> getArticleByPublisher(@PathVariable String articleId, @PathVariable String categoryId, @PathVariable String publisherId ) {
         Article article = this.articleService.getArticleByPublisher(articleId,categoryId, publisherId);
         ArticleDto articleDto = this.modelMapper.map(article, ArticleDto.class);
@@ -91,7 +100,7 @@ public class ArticleController {
     }
 
     @GetMapping("protected/articles")
-    @PreAuthorize("hasRole('PUBLISHER') or hasRole('READER') or hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('PUBLISHER') or hasRole('READER') or hasRole('ADMIN')")
     public ResponseEntity<ArticleDto> getArticle(@RequestParam("articleId") String articleId){
         Article article = this.articleService.getSingleArticle(articleId);
         ArticleDto articleDto = this.modelMapper.map(article, ArticleDto.class);
@@ -99,7 +108,7 @@ public class ArticleController {
     }
 
     @GetMapping("protected/users/{userId}/paid-articles")
-    @PreAuthorize("hasRole('PUBLISHER') or hasRole('READER') or hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('PUBLISHER') or hasRole('READER') or hasRole('ADMIN')")
     public ResponseEntity<List<ArticleDto>> getPaidArticlesByUser(@PathVariable("userId") String userId){
         List<Article> articles = this.articleService.getAllBoughtArticles(userId);
         List<ArticleDto> articleDtos = articles.
@@ -109,7 +118,7 @@ public class ArticleController {
     }
 
     @GetMapping("protected/users/{userId}/paid-articles/{articleId}")
-    @PreAuthorize("hasRole('PUBLISHER') or hasRole('READER') or hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('PUBLISHER') or hasRole('READER') or hasRole('ADMIN')")
     public ResponseEntity<ArticleDto> getPaidArticleByUser(@PathVariable String userId, @PathVariable String articleId){
         Article article = this.articleService.getBoughtArticle(userId, articleId);
         ArticleDto articleDto = this.modelMapper.map(article, ArticleDto.class);
