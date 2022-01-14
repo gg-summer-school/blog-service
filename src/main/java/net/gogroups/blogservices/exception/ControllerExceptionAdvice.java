@@ -42,11 +42,11 @@ public class ControllerExceptionAdvice  extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
     }
 
-//    @ExceptionHandler(CustomIOException.class)
-//    public ResponseEntity<?> handleIOException(Exception exception, WebRequest webRequest){
-//        ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage(), webRequest.getDescription(false), new Date());
-//        return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
+    @ExceptionHandler(CustomIOException.class)
+    public ResponseEntity<?> handleIOException(Exception exception, WebRequest webRequest){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage(), webRequest.getDescription(false), new Date());
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     @ExceptionHandler(UnAuthorizedException.class)
     public ResponseEntity<?> handleUnAuthorizedException(Exception exception, WebRequest webRequest){
