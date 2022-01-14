@@ -15,20 +15,20 @@ import lombok.RequiredArgsConstructor;
 import net.gogroups.blogservices.model.Transaction;
 import net.gogroups.blogservices.service.TransactionService;
 
-@RequestMapping("/api")
+@RequestMapping("/api/")
 @RestController
 @RequiredArgsConstructor
 public class TransactionController {
 
 	private final TransactionService transactionService;
 	
-	@PostMapping("/private/transaction/user/{user_id}/article/{article_id}")
+	@PostMapping("protected/transaction/user/{user_id}/article/{article_id}")
 	public Transaction payForArticleByUser(@PathVariable String user_id, @PathVariable String article_id, 
 			@Valid @RequestBody Transaction transaction) {
 		return transactionService.payForArticle(user_id, article_id, transaction);
 	}
 	
-	@GetMapping("/private/transaction/user/{user_id}")
+	@GetMapping("protected/transaction/user/{user_id}")
 	public List<Transaction> getAllTransactionsOfUser(@PathVariable String user_id) {
 		return transactionService.getAllTransactionsOfAUser(user_id);
 				
