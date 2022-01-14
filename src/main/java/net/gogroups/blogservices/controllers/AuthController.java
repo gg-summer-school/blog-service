@@ -1,14 +1,19 @@
 package net.gogroups.blogservices.controllers;
 
+import net.gogroups.blogservices.exception.TokenRefreshException;
 import net.gogroups.blogservices.model.ERole;
+import net.gogroups.blogservices.model.RefreshToken;
 import net.gogroups.blogservices.model.Role;
 import net.gogroups.blogservices.model.User;
 import net.gogroups.blogservices.payload.request.LoginRequest;
 import net.gogroups.blogservices.payload.request.SignupRequest;
+import net.gogroups.blogservices.payload.request.TokenRefreshRequest;
 import net.gogroups.blogservices.payload.response.JwtResponse;
 import net.gogroups.blogservices.payload.response.MessageResponse;
+import net.gogroups.blogservices.payload.response.TokenRefreshResponse;
 import net.gogroups.blogservices.repository.RoleRepository;
 import net.gogroups.blogservices.repository.UserRepository;
+import net.gogroups.blogservices.security.service.RefreshTokenService;
 import net.gogroups.blogservices.security.service.UserDetailsImpl;
 import net.gogroups.blogservices.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "4200")
@@ -44,25 +50,40 @@ public class AuthController {
     @Autowired
     JwtUtils jwtUtils;
 
+    @Autowired
+    RefreshTokenService refreshTokenService;
+
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+        Authentication authentication = authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
+
+        String jwt = jwtUtils.generateJwtToken(userDetails);
+
+        List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new JwtResponse(jwt,
-                userDetails.getId(),
-                userDetails.getUsername(),
-                userDetails.getEmail(),
-                roles));
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+
+        return ResponseEntity.ok(new JwtResponse(jwt, refreshToken.getToken(), userDetails.getId(),
+                userDetails.getEmail(), roles));
+    }
+
+    @PostMapping("/refreshtoken")
+    public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
+        String requestRefreshToken = request.getRefreshToken();
+
+        return refreshTokenService.findByToken(requestRefreshToken).map(refreshTokenService::verifyExpiration)
+                .map(RefreshToken::getUser).map(user -> {
+                    String token = jwtUtils.generateTokenFromUsername(user.getEmail());
+                    return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
+                })
+                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Refresh token is not in database!"));
     }
 
     @PostMapping("/signup")
@@ -87,7 +108,8 @@ public class AuthController {
                     .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
             roles.add(userRole);
         }
-        User user = new User(signUpRequest.getEmail(),
+        User user = new User(UUID.randomUUID().toString(),
+                signUpRequest.getEmail(),
                 signUpRequest.getName(),
                 encoder.encode(signUpRequest.getPassword()),
                 true,

@@ -2,12 +2,11 @@ package net.gogroups.blogservices.payload.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.gogroups.blogservices.model.Role;
-
-import java.util.List;
+import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class SignupRequest {
 
     private String email;

@@ -37,7 +37,8 @@ public class User {
     @OneToMany(mappedBy = "user", cascade =  CascadeType.ALL)
     private List<Article> articles;
 
-    public User(String email, String name, String password, boolean active, boolean isApproved) {
+    public User(String id, String email, String name, String password, boolean active, boolean isApproved) {
+        this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
