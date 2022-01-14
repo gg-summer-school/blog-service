@@ -2,7 +2,7 @@ package net.gogroups.blogservices.service.serviceImpl;
 
 
 import net.gogroups.blogservices.exception.ForbiddenException;
-import net.gogroups.blogservices.exception.NotFoundException;
+import net.gogroups.blogservices.exception.ResourceNotFoundException;
 import net.gogroups.blogservices.model.Article;
 import net.gogroups.blogservices.model.Category;
 import net.gogroups.blogservices.model.User;
@@ -42,7 +42,7 @@ public class ArticleServiceImpl  implements ArticleService {
             throw new ForbiddenException("User account is suspended");
         }
         Optional<Category>  category = categoryRepository.findById(categoryId);
-        category.orElseThrow(() -> new NotFoundException("Category not found"));
+        category.orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         article.setCoverPage(StringUtils.cleanPath(coverPage.getOriginalFilename()));
         article.setDocument(StringUtils.cleanPath(document.getOriginalFilename()));
         article.setCategory(category.get());
@@ -100,7 +100,7 @@ public class ArticleServiceImpl  implements ArticleService {
         Optional<Article> article = articleRepository.findAll().stream().
                 filter((art) -> art.getId().equals(articleId) && art.getCategory().getId().equals(categoryId))
                 .findFirst();
-        article.orElseThrow(() -> new NotFoundException("Resource not Found"));
+        article.orElseThrow(() -> new ResourceNotFoundException("Resource not Found"));
         if(!article.get().getUser().getId().equals(authUser.getId())){
             throw new ForbiddenException("Permission denied");
         }
@@ -110,7 +110,7 @@ public class ArticleServiceImpl  implements ArticleService {
     @Override
     public Article getSingleArticle(String articleId) {
         Optional<Article> article = articleRepository.findById(articleId);
-        article.orElseThrow(() -> new NotFoundException("Resource not found"));
+        article.orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
         return article.get();
     }
 
