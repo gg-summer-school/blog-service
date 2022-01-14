@@ -1,4 +1,4 @@
-package net.gogroups.blogservices.controllers;
+package net.gogroups.blogservices.controller;
 
 import net.gogroups.blogservices.exception.TokenRefreshException;
 import net.gogroups.blogservices.model.ERole;

@@ -1,3 +1,9 @@
+
+package net.gogroups.blogservices.swagger;
+
+//@Configuration
+//@EnableSwagger2
+public class SwaggerConfiguration {
 //package net.gogroups.blogservices.swagger;
 //
 //import java.util.Arrays;
@@ -25,6 +31,7 @@
 //@EnableSwagger2
 //public class SwaggerConfiguration {
 
+
 //    public static final String AUTHORIZATION_HEADER = "Authorization";
 //
 //    public static final Contact DEFAULT_CONTACT = new Contact("www.gogroups.net", "", "someoneh@gmail.com");
@@ -44,11 +51,7 @@
 //        public Docket api() {
 //            return new Docket(DocumentationType.SWAGGER_2)
 //                    .select()
-//                    .apis(RequestHandlerSelectors.basePackage("net.gogroups.blogservices"))
-//                    .paths(PathSelectors.any())
-//                    .build();
-//        }
-//    }
+
 
 //    @Bean
 //    public Docket api() {
@@ -70,5 +73,5 @@
 //        return Arrays.asList(new SecurityReference("JWT", authorizationScopes));
 //    }
 
-//}
+}
 
