@@ -1,9 +1,10 @@
 package net.gogroups.blogservices.model;
 
-import lombok.AllArgsConstructor;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Data;
 
 import javax.persistence.*;
 import java.util.List;
@@ -13,10 +14,12 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@Data
 public class Role {
     @Id
     @Column(length = 50)
-    private String id;
+    @GeneratedValue( strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     private ERole role;
@@ -24,7 +27,7 @@ public class Role {
     @ManyToMany(mappedBy = "role")
     private List<User> user;
 
-    public Role(String id, ERole role){
+    public Role(Long id, ERole role){
         this.id = id;
         this.role = role;
     }
