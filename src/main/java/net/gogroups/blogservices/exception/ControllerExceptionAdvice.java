@@ -26,7 +26,7 @@ public class ControllerExceptionAdvice  extends ResponseEntityExceptionHandler {
             String message = error.getDefaultMessage();
             errors.put(fieldName, message);
         });
-        MethodArgumentNotValidExceptionResponse response = new MethodArgumentNotValidExceptionResponse("Invalid", errors);
+        MethodArgumentNotValidExceptionResponse response = new MethodArgumentNotValidExceptionResponse("Invalid Arguments", errors);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -42,9 +42,15 @@ public class ControllerExceptionAdvice  extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(CustomIOException.class)
-    public ResponseEntity<?> handleIOException(Exception exception, WebRequest webRequest){
+//    @ExceptionHandler(CustomIOException.class)
+//    public ResponseEntity<?> handleIOException(Exception exception, WebRequest webRequest){
+//        ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage(), webRequest.getDescription(false), new Date());
+//        return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
+
+    @ExceptionHandler(UnAuthorizedException.class)
+    public ResponseEntity<?> handleUnAuthorizedException(Exception exception, WebRequest webRequest){
         ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage(), webRequest.getDescription(false), new Date());
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.UNAUTHORIZED);
     }
 }
