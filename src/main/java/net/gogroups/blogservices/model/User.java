@@ -37,5 +37,22 @@ public class User {
     @OneToMany(mappedBy = "user", cascade =  CascadeType.ALL)
     private List<Article> articles;
 
+    public User(String id, String email, String name, String password, boolean active, boolean isApproved) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.active = active;
+        this.isApproved = isApproved;
+        this.role = role;
+    }
 
+
+    public List<Role> getRole() {
+        return role;
+    }
+
+    public void setRole(List<Role> role) {
+        this.role = role;
+    }
 }
