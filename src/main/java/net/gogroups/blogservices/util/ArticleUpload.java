@@ -14,51 +14,30 @@ import java.nio.file.StandardCopyOption;
 
 public class ArticleUpload {
 
-    @Value("${gogroroups.app.articleDocumentDirectoryName}")
-    private String coverPageDir;
-    @Value("${gogroups.app.articleCoverPageDirectoryName}")
-    private String articleDocDir;
-    public void uploadArticleWithCoverPage(Category category, MultipartFile coverPage, MultipartFile document)  {
-        InputStream coverPageInputStream = null;
-        InputStream documentInputStream = null;
-        Path uploadCoverPageDir = Paths.get(this.coverPageDir+"/"+category.getName());
-        Path  uploadDocDir = Paths.get(this.articleDocDir+"/"+category.getName());
-        if(!Files.exists(uploadCoverPageDir)){
-            try {
-                Files.createDirectory(uploadCoverPageDir);
-            } catch (IOException se) {
-                throw  new CustomIOException("could not create folder to store the article cover page");
-            }
-        }
+    public void uploadFile(Category category, String baseDir,  MultipartFile file)  {
+        InputStream inputStream = null;
+        Path  uploadDocDir = Paths.get(category.getName());
         if(!Files.exists(uploadDocDir)){
             try {
                 Files.createDirectory(uploadDocDir);
             } catch (IOException e) {
-                throw  new CustomIOException("could not create folder to store the article");
+                throw  new CustomIOException("could not create folder to store the file");
             }
         }
         try {
-            coverPageInputStream = coverPage.getInputStream();
-        } catch (IOException e) {
-           throw new CustomIOException("could not read file data");
-        }
-        try {
-            documentInputStream = document.getInputStream();
+            inputStream = file.getInputStream();
         } catch (IOException e) {
             throw new CustomIOException("could not read file data");
         }
-        Path coverPageFilePath = uploadCoverPageDir.resolve(coverPage.getName());
-        Path documentFilePath = uploadDocDir.resolve(document.getName());
+        Path filePath = uploadDocDir.resolve(file.getName());
         try {
-            Files.copy(coverPageInputStream, coverPageFilePath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            throw new CustomIOException("could not copy file data");
-        }
-        try {
-            Files.copy(documentInputStream, documentFilePath, StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new CustomIOException("could not copy file data");
         }
 
     }
+
+
+
 }
