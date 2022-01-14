@@ -10,7 +10,8 @@ import java.util.List;
 public class Role {
     @Id
     @Column(length = 50)
-    private String id;
+    @GeneratedValue( strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     private ERole role;

@@ -98,14 +98,15 @@ public class AuthController {
         // Create new user's account
         String strRoles = signUpRequest.getRole();
         List<Role> roles = new ArrayList<>();
+        System.out.println(strRoles);
 
         if(strRoles == "PUBLISHER") {
-            Role userRole = roleRepository.findByRole(ERole.PUBLISHER)
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+            Role userRole = roleRepository.findByRole(ERole.PUBLISHER);
+//                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
             roles.add(userRole);
         } else {
-            Role userRole = roleRepository.findByRole(ERole.READER)
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+            Role userRole = roleRepository.findByRole(ERole.READER);
+//                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
             roles.add(userRole);
         }
         User user = new User(UUID.randomUUID().toString(),
