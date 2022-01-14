@@ -2,7 +2,8 @@ package net.gogroups.blogservices.service.serviceImpl;
 
 
 import net.gogroups.blogservices.exception.ForbiddenException;
-import net.gogroups.blogservices.exception.NotFoundException;
+
+import net.gogroups.blogservices.exception.ResourceNotFoundException;
 import net.gogroups.blogservices.exception.UnAuthorizedException;
 import net.gogroups.blogservices.model.Article;
 import net.gogroups.blogservices.model.Category;
@@ -53,7 +54,7 @@ public class ArticleServiceImpl  implements ArticleService {
             throw new ForbiddenException("User account is suspended");
         }
         Optional<Category>  category = categoryRepository.findById(categoryId);
-        category.orElseThrow(() -> new NotFoundException("Category not found"));
+        category.orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         article.setCategory(category.get());
         article.setId(util.generateId());
         article.setUser(publisher);
@@ -111,7 +112,7 @@ public class ArticleServiceImpl  implements ArticleService {
         Optional<Article> article = articleRepository.findAll().stream().
                 filter((art) -> art.getId().equals(articleId) && art.getCategory().getId().equals(categoryId))
                 .findFirst();
-        article.orElseThrow(() -> new NotFoundException("Resource not Found"));
+        article.orElseThrow(() -> new ResourceNotFoundException("Resource not Found"));
         if(!article.get().getUser().getId().equals(authUser.getId())){
             throw new ForbiddenException("Permission denied");
         }
@@ -121,7 +122,7 @@ public class ArticleServiceImpl  implements ArticleService {
     @Override
     public Article getSingleArticle(String articleId) {
         Optional<Article> article = articleRepository.findById(articleId);
-        article.orElseThrow(() -> new NotFoundException("Resource not found"));
+        article.orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
         return article.get();
     }
 
@@ -135,7 +136,7 @@ public class ArticleServiceImpl  implements ArticleService {
     @Override
     public void uploadArticleWithCoverPageImage(String articleId,  MultipartFile coverPage, MultipartFile document) {
         Optional<Article>  article = articleRepository.findById(articleId);
-        article.orElseThrow(() -> new NotFoundException("Category not found"));
+        article.orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         Category category = article.get().getCategory();
         article.get().setCoverPage(StringUtils.cleanPath(coverPage.getOriginalFilename()));
         article.get().setDocument(StringUtils.cleanPath(document.getOriginalFilename()));
@@ -164,7 +165,7 @@ public class ArticleServiceImpl  implements ArticleService {
     @Override
     public Article getBoughtArticle(String userId, String articleId) {
         Optional<Transaction> transaction = transactionRepository.findAll().stream().filter((transaction1 -> transaction1.getUser().getId().equals(userId))).findFirst();
-        transaction.orElseThrow(() -> new NotFoundException("Resource not found"));
+        transaction.orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
         Article article = articleRepository.findById(articleId).get();
         return article;
 
