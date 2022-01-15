@@ -49,25 +49,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    
-    @Override
-	public void configure(WebSecurity webSecurity) throws Exception{
-		webSecurity
-		       .ignoring()
-		       .antMatchers("/webjars","/swagger-resources/**","/resources/**","favicon.ico","/api/public/auth/**","/v2/api-docs","/swagger-ui.html#")
-		       .anyRequest();
-
-	}
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests().antMatchers("/api/public/auth/**", "/v2/api-docs", "/swagger-ui.html#").permitAll()
-                .antMatchers("/api/test/**").permitAll()
+        http.cors().and().csrf().disable().exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
+                .antMatchers("/api/auth/register").permitAll().antMatchers("/api/auth/login").permitAll()
+                .antMatchers("/swagger-ui/**").permitAll().antMatchers("/swagger-ui.html").permitAll()
                 .antMatchers("/api/**").permitAll()
-                .anyRequest().authenticated();
+                .antMatchers("/swagger-resources/**").permitAll().antMatchers("/v2/**").permitAll().anyRequest()
+                .authenticated();
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
