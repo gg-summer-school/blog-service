@@ -21,6 +21,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(
+		// securedEnabled = true,
+		// jsr250Enabled = true,
+		prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -54,7 +58,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	public void configure(WebSecurity webSecurity) throws Exception{
 		webSecurity
 		       .ignoring()
-		       .antMatchers("/webjars","/swagger-resources/**","/resources/**","favicon.ico","/api/public/auth/**","/v2/api-docs","/swagger-ui.html#")
+		       .antMatchers("/webjars","/swagger-resources/**","/resources/**","favicon.ico","/api/auth/**","/v2/api-docs","/swagger-ui.html#")
 		       .anyRequest();
 
 	}
