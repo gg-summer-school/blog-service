@@ -2,6 +2,7 @@ package net.gogroups.blogservices.security;
 
 import net.gogroups.blogservices.security.jwt.AuthEntryPointJwt;
 import net.gogroups.blogservices.security.jwt.AuthTokenFilter;
+import net.gogroups.blogservices.security.jwt.JwtUtils;
 import net.gogroups.blogservices.security.service.UserDetailsServiceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 
 @Configuration
 @EnableWebSecurity
@@ -32,6 +33,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
+    
+    @Autowired
+    private JwtUtils jwtUtils;
 
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -56,23 +60,41 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     
     @Override
 	public void configure(WebSecurity webSecurity) throws Exception{
-		webSecurity
-		       .ignoring()
-		       .antMatchers("/webjars","/swagger-resources/**","/resources/**","favicon.ico","/api/auth/**","/v2/api-docs","/swagger-ui.html#")
-		       .anyRequest();
+		webSecurity.ignoring().antMatchers("/v2/api-docs")//
+        .antMatchers("/swagger-resources/**")//
+        .antMatchers("/swagger-ui.html")//
+        .antMatchers("/configuration/**")//
+        .antMatchers("/webjars/**")//
+        .antMatchers("/public")
+        .and()
+        .ignoring()
+        .antMatchers("/h2-console/**/**");;
 
 	}
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests().antMatchers("/api/public/auth/**", "/v2/api-docs", "/swagger-ui.html#").permitAll()
-                .antMatchers("/api/test/**").permitAll()
-                .antMatchers("/api/**").permitAll()
-                .anyRequest().authenticated();
+    	 // Disable CSRF (cross site request forgery)
+        http.csrf().disable();
 
-        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        // No session will be created or used by spring security
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+        // Entry points
+        http.authorizeRequests()//
+            .antMatchers("/api/public/auth/signin").permitAll()//
+            .antMatchers("/api/public/auth/signup").permitAll()//
+            .antMatchers("/h2-console/**/**").permitAll()
+            // Disallow everything else..
+            .anyRequest().authenticated();
+
+        // If a user try to access a resource without having enough permissions
+        http.exceptionHandling().accessDeniedPage("/login");
+
+        // Apply JWT
+        http.apply(new JwtTokenFilterConfigurer(jwtUtils));
+
+        // Optional, if you want to test the API from a browser
+        // http.httpBasic();
     }
 }

@@ -25,7 +25,7 @@ public class CateogoryController {
 	
 	private final CategoryService categoryService;
 	
-	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER') or hasRole('ADMIN')")
+//	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER') or hasRole('ADMIN')")
 	@GetMapping("public/categories")
 	public List<Category> getAllCategories() {
 		List<Category> allCategories = categoryService.getAllCategories();
