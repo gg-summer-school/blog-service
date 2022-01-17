@@ -1,5 +1,6 @@
 package net.gogroups.blogservices.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,11 +26,10 @@ public class Contributor {
             joinColumns = @JoinColumn(name = "article_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "contributor_id",
                     referencedColumnName = "id"))
+    @JsonIgnore
     private List<Article> articles = new ArrayList<>();
 
-    public void addArticle(Article article){
-        this.articles.add(article);
-    }
+
 
 
 }

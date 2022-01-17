@@ -11,6 +11,7 @@ import net.gogroups.blogservices.util.SuccessResponse;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,19 +37,19 @@ public class ArticleController {
 
     @PostMapping("protected/publishers/{publisherId}/articles/categories/{categoryId}")
     //@PreAuthorize("hasRole('PUBLISHER')")
-    public ResponseEntity<?> createProduct(@PathVariable("categoryId") String categoryId,
+    public ResponseEntity<?> createArticle(@PathVariable("categoryId") String categoryId,
                                            @PathVariable("publisherId") String publisherId,
                                            @Valid @RequestBody ArticlePayload articlePayload){
         Article article = this.modelMapper.map(articlePayload, Article.class);
-        this.articleService.createArticle(article, categoryId, publisherId);
-        return new ResponseEntity<>(new SuccessResponse("article created successfully", new Date()), HttpStatus.CREATED);
+        Article createdArticle = this.articleService.createArticle(article, categoryId, publisherId);
+        return new ResponseEntity<>(new SuccessResponse(createdArticle.getId(), new Date()), HttpStatus.CREATED);
     }
 
 
-    @PutMapping("protected/publishers/{publisherId}/articles/{articleId}/file-uploads")
+    @PutMapping(path = "protected/publishers/{publisherId}/articles/{articleId}/file-uploads", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     //@PreAuthorize("hasRole('PUBLISHER')")
     public ResponseEntity<?> uploadFile(@PathVariable String articleId,
-                                        @PathVariable String publisherId, MultipartFile coverPage, MultipartFile document){
+                                        @PathVariable String publisherId, @RequestPart("coverPage") MultipartFile coverPage, @RequestPart("document") MultipartFile document){
         this.articleService.uploadArticleWithCoverPageImage(articleId, coverPage, document);
         return new ResponseEntity<>(new SuccessResponse("Files uploaded successfully",  new Date()), HttpStatus.OK);
     }
