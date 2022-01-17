@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -14,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Article {
+public class Article extends  BaseEntity{
 
     @Id
     @Column(length = 50)
@@ -34,11 +35,13 @@ public class Article {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @ManyToMany(mappedBy = "article")
-    private List<Contributor> contributor;
+    @ManyToMany(mappedBy = "articles", cascade = CascadeType.ALL)
+    private List<Contributor> contributors = new ArrayList<>();
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     private List<Transaction> transaction;
+
+
 
 
 }

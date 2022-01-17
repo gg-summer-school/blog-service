@@ -1,7 +1,5 @@
 package net.gogroups.blogservices.service.serviceImpl;
 
-import net.gogroups.blogservices.exception.ResourceNotFoundException;
-import net.gogroups.blogservices.model.Article;
 import net.gogroups.blogservices.model.Contributor;
 import net.gogroups.blogservices.repository.ArticleRepository;
 import net.gogroups.blogservices.repository.ContributorRepository;
@@ -11,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ContributorServiceImpl implements ContributorService {
@@ -22,17 +19,14 @@ public class ContributorServiceImpl implements ContributorService {
     private Util util = new Util();
 
     @Override
-    public void addContributor(String[] names, String articleId) {
-        Optional<Article> article = articleRepository.findById(articleId);
-        article.orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        for (String name : names) {
-            Contributor contributor = new Contributor();
-            contributor.setId(util.generateId());
-            contributor.setName(name);
-            Contributor contributor1 = contributorRepository.saveAndFlush(contributor);
-
-        }
-
+    public void addContributors(List<Contributor> contributors, String articleId) {
+        contributors.stream().forEach(contributor -> {
+            Contributor contributor1 = new Contributor();
+            contributor1.setId(util.generateId());
+            contributor1.setName(contributor.getName());
+            Contributor createdContributor = contributorRepository.saveAndFlush(contributor1);
+            contributorRepository.insertArticleContributor( articleId, createdContributor.getId());
+        });
     }
 
     @Override
