@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.gogroups.blogservices.model.Contributor;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
@@ -34,7 +33,7 @@ public class ArticlePayload {
     @DecimalMin(value = "1.0")
     private BigDecimal price;
 
-    private List<Contributor> contributors;
+    private List<ContributorPayload> contributors;
 
 
 
