@@ -5,8 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.gogroups.blogservices.model.Contributor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,5 +26,8 @@ public class ArticleDto {
     private BigDecimal price;
     private String  userId;
     private String categoryId;
+//    private List<Contributor> contributors;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
 }

@@ -18,6 +18,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
 @Configuration
@@ -58,43 +59,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
     
-    @Override
-	public void configure(WebSecurity webSecurity) throws Exception{
-		webSecurity.ignoring().antMatchers("/v2/api-docs")//
-        .antMatchers("/swagger-resources/**")//
-        .antMatchers("/swagger-ui.html")//
-        .antMatchers("/configuration/**")//
-        .antMatchers("/webjars/**")//
-        .antMatchers("/public")
-        .and()
-        .ignoring()
-        .antMatchers("/h2-console/**/**");;
+  
+    	@Override
+    	public void configure(WebSecurity web) throws Exception {
+    		web.ignoring().antMatchers("/swagger-ui/**", "/v3/api-docs/**");
+    	}
+    
 
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http.cors().and().csrf().disable()
+			.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+			.authorizeRequests().antMatchers("/api/public/auth/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
+			.antMatchers("/api/test/**").permitAll()
+			.anyRequest().authenticated();
+
+		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-    	 // Disable CSRF (cross site request forgery)
-        http.csrf().disable();
-
-        // No session will be created or used by spring security
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-        // Entry points
-        http.authorizeRequests()//
-            .antMatchers("/api/public/auth/signin").permitAll()//
-            .antMatchers("/api/public/auth/signup").permitAll()//
-            .antMatchers("/h2-console/**/**").permitAll()
-            // Disallow everything else..
-            .anyRequest().authenticated();
-
-        // If a user try to access a resource without having enough permissions
-        http.exceptionHandling().accessDeniedPage("/login");
-
-        // Apply JWT
-        http.apply(new JwtTokenFilterConfigurer(jwtUtils));
-
-        // Optional, if you want to test the API from a browser
-        // http.httpBasic();
-    }
 }

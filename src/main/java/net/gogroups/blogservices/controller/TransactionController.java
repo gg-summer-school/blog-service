@@ -23,14 +23,14 @@ public class TransactionController {
 
 	private final TransactionService transactionService;
 	
-	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER') or hasRole('ADMIN')")
+//	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER') or hasRole('ADMIN')")
 	@PostMapping("protected/transaction/user/{user_id}/article/{article_id}")
 	public Transaction payForArticleByUser(@PathVariable String user_id, @PathVariable String article_id, 
 			@Valid @RequestBody Transaction transaction) {
 		return transactionService.payForArticle(user_id, article_id, transaction);
 	}
 	
-	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER') or hasRole('ADMIN')")
+//	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER') or hasRole('ADMIN')")
 	@GetMapping("protected/transaction/user/{user_id}")
 	public List<Transaction> getAllTransactionsOfUser(@PathVariable String user_id) {
 		return transactionService.getAllTransactionsOfAUser(user_id);

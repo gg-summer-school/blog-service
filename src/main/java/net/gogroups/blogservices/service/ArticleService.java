@@ -19,4 +19,5 @@ public interface ArticleService {
     public void uploadArticleWithCoverPageImage(String categoryId, MultipartFile coverPage, MultipartFile document);
     public List<Article> getAllBoughtArticles(String userId);
     public Article getBoughtArticle(String userId, String articleId);
+    public List<Article> searchArticle(String title);
 }
