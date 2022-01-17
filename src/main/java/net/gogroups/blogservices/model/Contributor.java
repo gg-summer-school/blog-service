@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -19,12 +20,16 @@ public class Contributor {
     private String id;
     private String name;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "article_contributor",
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "article_contributors",
             joinColumns = @JoinColumn(name = "article_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "contributor_id",
                     referencedColumnName = "id"))
-    private List<Article> article;
+    private List<Article> articles = new ArrayList<>();
+
+    public void addArticle(Article article){
+        this.articles.add(article);
+    }
 
 
 }
