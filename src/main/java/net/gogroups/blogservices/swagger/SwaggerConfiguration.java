@@ -1,32 +1,22 @@
 package net.gogroups.blogservices.swagger;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.ApiKey;
-import springfox.documentation.service.AuthorizationScope;
-import springfox.documentation.service.Contact;
-import springfox.documentation.service.SecurityReference;
+import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.*;
 @EnableSwagger2
 @Configuration
-public class SwaggerConfig {
-	
-	public static final String AUTHORIZATION_HEADER = "Authorization";
-	private static final Set<String> PRODUCES = new HashSet<String>(Arrays.asList("application/json"));
+public class SwaggerConfiguration {
+
+    public static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final Set<String> PRODUCES = new HashSet<String>(Arrays.asList("application/json"));
 
     private ApiKey apiKey(){
         return new ApiKey("JWT", AUTHORIZATION_HEADER, "header");
@@ -34,11 +24,11 @@ public class SwaggerConfig {
 
     private ApiInfo apiInfo(){
         return new ApiInfo(
-                "Product Catalog Service",
-                "Product Catalog REST API Documentation",
+                "Blog Service",
+                "Article Bloog REST API Documentation",
                 "1",
                 "Terms of service",
-                new Contact("Suh Edmond and Becks Ayuk", "www.website.net", "suhedmond25@yahoo.com, becksayuk@gmail.com"),
+                new Contact("Babi-Beulah, Vifieh Ruth and Suh Edmond", "www.website.net", "babibeulah@gmail.com, vifiehruth@gmail.com and suhedmond25@yahoo.com"),
                 "License of API",
                 "API license URL",
                 Collections.emptyList()
@@ -47,8 +37,8 @@ public class SwaggerConfig {
 
     @Bean
     public Docket api(){
-        
-		return new Docket(DocumentationType.SWAGGER_2)
+
+        return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .produces(PRODUCES)
                 .securityContexts(Arrays.asList(securityContext()))

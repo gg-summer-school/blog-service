@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +23,8 @@ import net.gogroups.blogservices.service.TransactionService;
 public class TransactionController {
 
 	private final TransactionService transactionService;
+	
+	private ModelMapper modelMapper;
 	
 //	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER') or hasRole('ADMIN')")
 	@PostMapping("protected/transaction/user/{user_id}/article/{article_id}")
