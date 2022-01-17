@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,7 +25,7 @@ public class CateogoryController {
 	
 	private final CategoryService categoryService;
 	
-	
+	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER') or hasRole('ADMIN')")
 	@GetMapping("public/categories")
 	public List<Category> getAllCategories() {
 		List<Category> allCategories = categoryService.getAllCategories();
@@ -32,6 +33,7 @@ public class CateogoryController {
         
 	}
 	
+	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER') or hasRole('ADMIN')")
 	@GetMapping("/public/categories/{categoryId}")
 	public Category getACategory(@PathVariable String categoryId) {
 		return categoryService.getOneCategory(categoryId);
