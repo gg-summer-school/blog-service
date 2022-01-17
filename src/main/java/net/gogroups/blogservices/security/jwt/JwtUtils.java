@@ -31,20 +31,20 @@ public class JwtUtils {
     	UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
 
 		return Jwts.builder()
-				.setSubject((userPrincipal.getUsername()))
+				.setSubject((userPrincipal.getEmail()))
 				.setIssuedAt(new Date())
 				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
 				.signWith(SignatureAlgorithm.HS512, jwtSecret)
 				.compact();
     }
 
-    public String generateTokenFromUsername(String username) {
-        return Jwts.builder().setSubject(username).setIssuedAt(new Date())
+    public String generateTokenFromEmail(String email) {
+        return Jwts.builder().setSubject(email).setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs)).signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
 
-    public String getUserNameFromJwtToken(String token) {
+    public String getEmailFromJwtToken(String token) {
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
     }
 
