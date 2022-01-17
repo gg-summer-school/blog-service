@@ -20,6 +20,7 @@ public class User {
     private String id;
     private String name;
     private String email;
+    private String username;
     private String password;
     private boolean active;
     private boolean isApproved;
@@ -37,7 +38,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade =  CascadeType.ALL)
     private List<Article> articles;
 
-    public User(String id, String email, String name, String password, boolean active, boolean isApproved) {
+    public User(String id, String email, String name,String username, String password, boolean active, boolean isApproved) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -45,6 +46,7 @@ public class User {
         this.active = active;
         this.isApproved = isApproved;
         this.role = role;
+        this.username = username;
     }
 
 

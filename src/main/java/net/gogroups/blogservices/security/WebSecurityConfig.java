@@ -54,7 +54,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	public void configure(WebSecurity webSecurity) throws Exception{
 		webSecurity
 		       .ignoring()
-		       .antMatchers("/webjars","/swagger-resources/**","/resources/**","favicon.ico","/api/public/auth/**","/v2/api-docs","/swagger-ui.html#")
+		       .antMatchers("/webjars","/swagger-resources/**","/resources/**","favicon.ico","/api/public/auth/**","/api/protected/**","/v2/api-docs","/swagger-ui.html#")
 		       .anyRequest();
 
 	}
@@ -64,7 +64,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests().antMatchers("/api/public/auth/**", "/v2/api-docs", "/swagger-ui.html#").permitAll()
+                .authorizeRequests().antMatchers("/api/public/auth/**", "/v2/api-docs", "/api/protected/**", "/swagger-ui.html#").permitAll()
                 .antMatchers("/api/test/**").permitAll()
                 .antMatchers("/api/**").permitAll()
                 .anyRequest().authenticated();

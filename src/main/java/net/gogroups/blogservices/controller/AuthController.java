@@ -1,5 +1,6 @@
 package net.gogroups.blogservices.controller;
 
+import io.swagger.annotations.ApiOperation;
 import net.gogroups.blogservices.exception.TokenRefreshException;
 import net.gogroups.blogservices.model.ERole;
 import net.gogroups.blogservices.model.RefreshToken;
@@ -25,6 +26,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.security.auth.login.AccountNotFoundException;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,33 +56,35 @@ public class AuthController {
     RefreshTokenService refreshTokenService;
 
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest)
+            throws AccountNotFoundException {
 
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        String jwt = jwtUtils.generateJwtToken(authentication);
+        String jwt = jwtUtils.generateJwtToken(userDetails);
 
         List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getUserId());
 
-        return ResponseEntity.ok(new JwtResponse(jwt, refreshToken.getToken(), userDetails.getId(),
-                userDetails.getEmail(), roles));
+        return ResponseEntity.ok(new JwtResponse(jwt, refreshToken.getToken(), userDetails.getUserId(),
+                userDetails.getName(), userDetails.getUsername(), userDetails.getEmail(), roles));
     }
 
+    @ApiOperation(value = "For the refresh token")
     @PostMapping("/refreshtoken")
     public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
         String requestRefreshToken = request.getRefreshToken();
 
         return refreshTokenService.findByToken(requestRefreshToken).map(refreshTokenService::verifyExpiration)
                 .map(RefreshToken::getUser).map(user -> {
-                    String token = jwtUtils.generateTokenFromUsername(user.getEmail());
+                    String token = jwtUtils.generateTokenFromUsername(user.getUsername());
                     return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
                 })
                 .orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Refresh token is not in database!"));
@@ -98,7 +102,6 @@ public class AuthController {
         // Create new user's account
         String strRoles = signUpRequest.getRole();
         List<Role> roles = new ArrayList<>();
-        System.out.println(strRoles);
 
         if(strRoles == "PUBLISHER") {
             Role userRole = roleRepository.findByRole(ERole.PUBLISHER);
@@ -112,6 +115,7 @@ public class AuthController {
         User user = new User(UUID.randomUUID().toString(),
                 signUpRequest.getEmail(),
                 signUpRequest.getName(),
+                signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()),
                 true,
                 false);

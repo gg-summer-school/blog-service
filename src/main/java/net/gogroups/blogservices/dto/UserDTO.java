@@ -8,13 +8,13 @@ import net.gogroups.blogservices.model.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDTO {
-	
-	 private String id;
-	 private String name;
-	 private String email;
-	 private String password;
-	 private boolean active = true;
-	 private boolean isApproved = false;
-	 private List<Role> role;
+
+	private String id;
+	private String name;
+	private String email;
+	private String username;
+	private String password;
+	private boolean active;
+	private boolean isApproved;
 	
 }
