@@ -19,8 +19,6 @@ public class TransactionDTO {
 
 	private String id;
     private String nameOfArticle;
-    private String userId;
-    private String articleId;
     private LocalDateTime createdAt;
 
 }

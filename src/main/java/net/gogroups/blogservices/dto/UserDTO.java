@@ -14,6 +14,6 @@ public class UserDTO {
 	 private String email;
 	 private boolean active;
 	 private boolean isApproved;
-//	 private List<Role> role;
+	 private List<Role> role;
 	
 }
