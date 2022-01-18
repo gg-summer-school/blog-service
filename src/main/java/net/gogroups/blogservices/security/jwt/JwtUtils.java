@@ -27,7 +27,9 @@ public class JwtUtils {
     @Value("${gogroups.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
-    public String generateJwtToken(UserDetailsImpl userPrincipal) {
+    public String generateJwtToken(Authentication authentication) {
+        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+//    }
         return generateTokenFromEmail(userPrincipal.getUsername());
 
     }

@@ -3,9 +3,7 @@ package net.gogroups.blogservices.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
-import net.gogroups.blogservices.dto.TransactionDTO;
-import net.gogroups.blogservices.dto.TransactionPayload;
-import net.gogroups.blogservices.dto.UserDTO;
+import net.gogroups.blogservices.dto.*;
 import net.gogroups.blogservices.model.Transaction;
 import net.gogroups.blogservices.model.User;
 import net.gogroups.blogservices.payload.response.MessageResponse;
@@ -41,8 +39,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
-import net.gogroups.blogservices.dto.ApproveUserPayload;
-import net.gogroups.blogservices.dto.SuspendUserPayload;
 import net.gogroups.blogservices.dto.TransactionDTO;
 import net.gogroups.blogservices.dto.TransactionPayload;
 import net.gogroups.blogservices.dto.UserDTO;
@@ -59,10 +55,13 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @ApiOperation(value = "This method is used to get user details.", authorizations = {
+	@Autowired
+	private ModelMapper modelMapper;
+
+
+	@ApiOperation(value = "This method is used to get user details.", authorizations = {
             @Authorization(value = "jwtToken") })
     @GetMapping("/users/user_profile")
-    @ResponseBody
     public ResponseEntity<?> retrieveUserDetails(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         return new ResponseEntity<>(userService.loadUserDetails(userDetails.getUsername()), HttpStatus.OK);
@@ -71,15 +70,17 @@ public class UserController {
 
     @ApiOperation(value = "This method is used to get edit user details.", authorizations = {
             @Authorization(value = "jwtToken") })
+	@PreAuthorize("hasRole('ADMIN') or hasRole('READER') or hasRole('PUBLISHER')")
     @PutMapping("/users/user_profile")
-    @ResponseBody
-    public ResponseEntity<User> editUserInfo(Authentication authentication, @Valid @RequestBody User editUser) {
+    public ResponseEntity<User> editUserInfo(Authentication authentication, @Valid @RequestBody UserPayload editUserPayload) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+		User editUser = modelMapper.map(editUserPayload, User.class);
         User user = userService.loadUserDetails(userDetails.getUsername()).get();
 
         if (!(user == null)) {
             user.setName(editUser.getName());
             user.setEmail(editUser.getEmail());
+			user.setPassword(editUser.getPassword());
 
             return new ResponseEntity<>(userService.saveUser(user), HttpStatus.NO_CONTENT);
 
@@ -88,11 +89,6 @@ public class UserController {
         }
     }
 
-
-	
-	 @Autowired
-	    private ModelMapper modelMapper;
-	
 	 //	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/users")
 	public ResponseEntity<List<UserDTO>> getAllUsers() {
