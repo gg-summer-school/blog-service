@@ -25,10 +25,10 @@ public class SwaggerConfiguration {
     private ApiInfo apiInfo(){
         return new ApiInfo(
                 "Blog Service",
-                "Article Bloog REST API Documentation",
+                "Article Blog REST API Documentation",
                 "1",
                 "Terms of service",
-                new Contact("Babi-Beulah, Vifieh Ruth and Suh Edmond", "www.website.net", "babibeulah@gmail.com, vifiehruth@gmail.com and suhedmond25@yahoo.com"),
+                new Contact("Babi Beulah, Vifieh Ruth and Suh Edmond", "www.website.net", "babibyoolah@gmail.com, vifiehruth@gmail.com and suhedmond25@yahoo.com"),
                 "License of API",
                 "API license URL",
                 Collections.emptyList()

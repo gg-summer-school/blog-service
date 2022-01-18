@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -47,6 +48,9 @@ public class UserController {
     
 	@Autowired
 	UserService userService;
+
+	@Autowired
+	PasswordEncoder encoder;
     
 	 @Autowired
 	 private ModelMapper modelMapper;
@@ -63,17 +67,17 @@ public class UserController {
 
     @ApiOperation(value = "This method is used to get edit user details.", authorizations = {
             @Authorization(value = "jwtToken") })
-	@PreAuthorize("hasRole('ADMIN') or hasRole('READER') or hasRole('PUBLISHER')")
+//	@PreAuthorize("hasRole('ADMIN') or hasRole('READER') or hasRole('PUBLISHER')")
     @PutMapping("/users/user_profile")
     public ResponseEntity<User> editUserInfo(Authentication authentication, @Valid @RequestBody UserPayload editUserPayload) {
   		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-		User editUser = modelMapper.map(editUserPayload, User.class);
+		User editUser = this.modelMapper.map(editUserPayload, User.class);
         User user = userService.loadUserDetails(userDetails.getUsername()).get();
 
         if (!(user == null)) {
             user.setName(editUser.getName());
             user.setEmail(editUser.getEmail());
-			user.setPassword(editUser.getPassword());
+			user.setPassword(encoder.encode(editUser.getPassword()));
 
             return new ResponseEntity<>(userService.saveUser(user), HttpStatus.NO_CONTENT);
 
