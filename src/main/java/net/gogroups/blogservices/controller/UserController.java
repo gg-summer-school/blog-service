@@ -64,9 +64,8 @@ public class UserController {
     @GetMapping("/users/user_profile")
     @ResponseBody
     public ResponseEntity<?> retrieveUserDetails(Authentication authentication) {
-//        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        //userDetails.getUsername())
-        return new ResponseEntity<>(userService.loadUserDetails("lucy22"), HttpStatus.OK);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return new ResponseEntity<>(userService.loadUserDetails(userDetails.getUsername()), HttpStatus.OK);
     }
 
 
@@ -81,7 +80,6 @@ public class UserController {
         if (!(user == null)) {
             user.setName(editUser.getName());
             user.setEmail(editUser.getEmail());
-            user.setUsername(editUser.getEmail());
 
             return new ResponseEntity<>(userService.saveUser(user), HttpStatus.NO_CONTENT);
 

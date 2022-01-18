@@ -21,8 +21,6 @@ public class UserDetailsImpl implements UserDetails {
 
     private String name;
 
-    private String username;
-
     private String email;
 
     @JsonIgnore
@@ -32,12 +30,11 @@ public class UserDetailsImpl implements UserDetails {
 
 
 
-    public UserDetailsImpl(String userId, String name, String username, String email, String password,
+    public UserDetailsImpl(String userId, String name,  String email, String password,
                            Collection<? extends GrantedAuthority> authorities) {
         super();
         this.userId = userId;
         this.name = name;
-        this.username = username;
         this.email = email;
         this.password = password;
         this.authorities = authorities;
@@ -51,12 +48,15 @@ public class UserDetailsImpl implements UserDetails {
         return new UserDetailsImpl(
                 user.getId(),
                 user.getName(),
-                user.getUsername(),
                 user.getEmail(),
                 user.getPassword(),
                 authorities);
     }
 
+    @Override
+    public String getUsername() {
+        return email;
+    }
 
     @Override
     public boolean isAccountNonExpired() {

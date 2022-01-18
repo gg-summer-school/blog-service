@@ -17,6 +17,7 @@ import net.gogroups.blogservices.repository.UserRepository;
 import net.gogroups.blogservices.security.service.RefreshTokenService;
 import net.gogroups.blogservices.security.service.UserDetailsImpl;
 import net.gogroups.blogservices.security.jwt.JwtUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/public/auth")
 public class AuthController {
+
     @Autowired
     AuthenticationManager authenticationManager;
 
@@ -74,7 +76,7 @@ public class AuthController {
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getUserId());
 
         return ResponseEntity.ok(new JwtResponse(jwt, refreshToken.getToken(), userDetails.getUserId(),
-                userDetails.getName(), userDetails.getUsername(), userDetails.getEmail(), roles));
+                userDetails.getName(),  userDetails.getEmail(), roles));
     }
 
     @ApiOperation(value = "For the refresh token")
@@ -84,7 +86,6 @@ public class AuthController {
 
         return refreshTokenService.findByToken(requestRefreshToken).map(refreshTokenService::verifyExpiration)
                 .map(RefreshToken::getUser).map(user -> {
-
                     String token = jwtUtils.generateTokenFromEmail(user.getEmail());
                     return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
                 })
@@ -104,22 +105,20 @@ public class AuthController {
         String strRoles = signUpRequest.getRole();
         List<Role> roles = new ArrayList<>();
 
-        if(strRoles == "PUBLISHER") {
-            Role userRole = roleRepository.findByRole(ERole.PUBLISHER);
-//                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-            roles.add(userRole);
-        } else {
-            Role userRole = roleRepository.findByRole(ERole.READER);
-//                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-            roles.add(userRole);
-        }
         User user = new User(UUID.randomUUID().toString(),
                 signUpRequest.getEmail(),
                 signUpRequest.getName(),
-                signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()),
                 true,
                 false);
+
+        if(strRoles.equals("PUBLISHER")) {
+            Role userRole = roleRepository.findByRole(ERole.PUBLISHER);
+            roles.add(userRole);
+        } else {
+            Role userRole = roleRepository.findByRole(ERole.READER);
+            roles.add(userRole);
+        }
 
         user.setRole(roles);
 

@@ -24,8 +24,4 @@ public class Role {
     @ManyToMany(mappedBy = "role")
     private List<User> user;
 
-    public Role(Long id, ERole role){
-        this.id = id;
-        this.role = role;
-    }
 }

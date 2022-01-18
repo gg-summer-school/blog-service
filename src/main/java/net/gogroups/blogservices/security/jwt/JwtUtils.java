@@ -28,27 +28,16 @@ public class JwtUtils {
     private int jwtExpirationMs;
 
     public String generateJwtToken(UserDetailsImpl userPrincipal) {
-        logger.info(userPrincipal.getUsername());
         return generateTokenFromEmail(userPrincipal.getUsername());
 
-    }
-
-    public String generateJwtToken(Authentication authentication) {
-    	UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
-
-		return Jwts.builder()
-				.setSubject((userPrincipal.getEmail()))
-				.setIssuedAt(new Date())
-				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-				.signWith(SignatureAlgorithm.HS512, jwtSecret)
-				.compact();
     }
 
     public String generateTokenFromEmail(String email) {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs)).signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
 

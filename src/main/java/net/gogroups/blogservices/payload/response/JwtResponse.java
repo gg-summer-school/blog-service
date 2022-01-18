@@ -14,7 +14,6 @@ public class JwtResponse {
     private final String refreshToken;
     private final String id;
     private final String name;
-    private final String username;
     private final String email;
     private final List<String> role;
 
