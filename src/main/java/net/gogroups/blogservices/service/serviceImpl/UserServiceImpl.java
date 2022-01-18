@@ -20,6 +20,7 @@ import net.gogroups.blogservices.util.Util;
 
 @Service
 public class UserServiceImpl implements UserService {
+	
     @Autowired
     UserRepository userRepository;
 
@@ -74,10 +75,10 @@ public class UserServiceImpl implements UserService {
 			throw new ResourceNotFoundException("User not found with id- "+ user_id);
 		}
 		
-		if(!userId.get().getRole().contains(ERole.PUBLISHER)) {
-			throw new ForbiddenException("User "+ userId.get().getName() +" is not a Publisher");
-
-		}
+//		if(!userId.get().getRole().contains(ERole.PUBLISHER)) {
+//			throw new ForbiddenException("User "+ userId.get().getName() +" is not a Publisher");
+//
+//		}
 			
 		if(userId.get().isApproved()) {
 			return "Publisher "+ userId.get().getName() +" is already approved";
@@ -162,6 +163,10 @@ public class UserServiceImpl implements UserService {
 			throw new ResourceNotFoundException("User not found with id- "+ user_id);
 		}
 		List<Transaction> allTransactionsOfAUser = userId.get().getTransactions();
+		if(allTransactionsOfAUser.isEmpty()) {
+			throw new ResourceNotFoundException(
+					"No Transactions found under user with id- "+ user_id);
+		}
 		return allTransactionsOfAUser;	
 		}
 
