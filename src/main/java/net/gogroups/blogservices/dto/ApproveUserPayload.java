@@ -17,6 +17,6 @@ public class ApproveUserPayload {
 
     @NotNull
     @NotBlank
-    private String isApproved;
+    private boolean isApproved;
 
 }
