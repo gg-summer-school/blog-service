@@ -23,20 +23,10 @@ import java.util.stream.Collectors;
 
 
 
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-import lombok.RequiredArgsConstructor;
 import net.gogroups.blogservices.dto.TransactionDTO;
 import net.gogroups.blogservices.dto.TransactionPayload;
 import net.gogroups.blogservices.dto.UserDTO;
-import net.gogroups.blogservices.model.Transaction;
-import net.gogroups.blogservices.model.User;
-import net.gogroups.blogservices.service.UserService;
-import net.gogroups.blogservices.util.SuccessResponse;
 import net.gogroups.blogservices.dto.ApproveUserPayload;
 import net.gogroups.blogservices.dto.SuspendUserPayload;
 
@@ -82,7 +72,7 @@ public class UserController {
         }
     }
 
-	 //	@PreAuthorize("hasRole('ADMIN')")
+	 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("users")
 	public ResponseEntity<List<UserDTO>> getAllUsers() {
 		List<User> allUsers = userService.getAllUsers();
@@ -91,7 +81,7 @@ public class UserController {
 		return new ResponseEntity<>(allUsersDtos, HttpStatus.OK);
 	}
 	
-//	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("users/{user_id}")
 	public ResponseEntity<UserDTO> getUser(@PathVariable String user_id) {
 		User aUser = userService.getAUser(user_id);
@@ -109,7 +99,7 @@ public class UserController {
 		return approvedPublisher;
 	}
 	
-//	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("suspend/user/{user_id}")
 	public String suspendAUer(@PathVariable String user_id, 
 			@Valid @RequestBody SuspendUserPayload suspendUserPayload) {
@@ -118,7 +108,7 @@ public class UserController {
 		return suspendedUser;
 	}
 	
-//	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("reactivate/user/{user_id}")
 	public String reactivateAUer(@PathVariable String user_id, 
 			@Valid @RequestBody SuspendUserPayload suspendUserPayload) {
@@ -127,7 +117,7 @@ public class UserController {
 		return activatedUser;
 	}
 	
-//	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER') or hasRole('ADMIN')")
+	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER') or hasRole('ADMIN')")
 	@PostMapping("transactions/user/{user_id}/article/{article_id}")
 	public ResponseEntity<?> payForArticleByUser(@PathVariable String user_id, @PathVariable String article_id, 
 			@Valid @RequestBody TransactionPayload transactionPayload) {
@@ -139,7 +129,7 @@ public class UserController {
 		return new ResponseEntity<>(new SuccessResponse(message, new Date(), ""), HttpStatus.CREATED);
 	}
 	
-//	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER') or hasRole('ADMIN')")
+	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER') or hasRole('ADMIN')")
 	@GetMapping("/transactions/user/{user_id}")
 	public ResponseEntity<List<TransactionDTO>> getAllTransactionsOfAUser(@PathVariable String user_id) {
 		List<Transaction> allTransactionsOfAUser = userService.getAllTransactionsOfAUser(user_id);
