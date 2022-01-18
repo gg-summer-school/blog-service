@@ -26,6 +26,7 @@ public class ArticleDto {
     private BigDecimal price;
     private String  userId;
     private String categoryId;
+    private List<Contributor> contributors;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

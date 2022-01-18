@@ -21,11 +21,7 @@ public class Contributor {
     private String id;
     private String name;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "article_contributors",
-            joinColumns = @JoinColumn(name = "article_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "contributor_id",
-                    referencedColumnName = "id"))
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "contributors")
     @JsonIgnore
     private List<Article> articles = new ArrayList<>();
 

@@ -40,12 +40,16 @@ public class Article extends  BaseEntity{
     @JsonBackReference
     private Category category;
 
-    @ManyToMany(mappedBy = "articles", cascade = CascadeType.ALL)
-    @JsonIgnore
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "article_contributors",
+            joinColumns = @JoinColumn(name = "article_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "contributor_id",
+                    referencedColumnName = "id"))
     private List<Contributor> contributors = new ArrayList<>();
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @JsonIgnore
     private List<Transaction> transaction;
 
 

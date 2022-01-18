@@ -6,10 +6,7 @@ import net.gogroups.blogservices.dto.ArticleResponse;
 import net.gogroups.blogservices.exception.ForbiddenException;
 import net.gogroups.blogservices.exception.ResourceNotFoundException;
 import net.gogroups.blogservices.exception.UnAuthorizedException;
-import net.gogroups.blogservices.model.Article;
-import net.gogroups.blogservices.model.Category;
-import net.gogroups.blogservices.model.Transaction;
-import net.gogroups.blogservices.model.User;
+import net.gogroups.blogservices.model.*;
 import net.gogroups.blogservices.repository.ArticleRepository;
 import net.gogroups.blogservices.repository.CategoryRepository;
 import net.gogroups.blogservices.repository.TransactionRepository;
@@ -52,7 +49,6 @@ public class ArticleServiceImpl  implements ArticleService {
     private TransactionRepository transactionRepository;
     @Autowired
     ContributorServiceImpl contributorService;
-    AppConfig appConfig = new AppConfig();
     @Autowired
     private ModelMapper modelMapper;
 
@@ -76,8 +72,9 @@ public class ArticleServiceImpl  implements ArticleService {
         newArticle.setPrice(article.getPrice());
         newArticle.setTitle(article.getTitle());
         newArticle.setToc(article.getToc());
+        List<Contributor> contributors = this.contributorService.addContributors(article.getContributors());
+        newArticle.setContributors(contributors);
         Article createdArticle = articleRepository.saveAndFlush(newArticle);
-        this.contributorService.addContributors(article.getContributors(), createdArticle.getId());
         return createdArticle;
 
     }
@@ -136,10 +133,10 @@ public class ArticleServiceImpl  implements ArticleService {
         if(!authUser.isApproved()){
            throw new ForbiddenException("Publisher account is not yet approve");
         }
-        List<Article> articles = articleRepository.findAll();
-                articles.stream().filter((article -> article.getUser().getId().equals(authUser.getId()))).
+        List<Article> articles = articleRepository.findAll()
+                .stream().filter((article -> article.getUser().getId().equals(authUser.getId()))).
                         collect(Collectors.toList());
-        return null;
+        return articles;
     }
 
     @Override
@@ -223,7 +220,7 @@ public class ArticleServiceImpl  implements ArticleService {
     public Resource loadFileAsResource(String articleId) {
         Path dirLocation;
         Optional<Article> downloadedArticle = this.articleRepository.findById(articleId);
-        downloadedArticle.orElseThrow(() -> new ResourceNotFoundException("article not found"));
+        downloadedArticle.orElseThrow(() -> new ResourceNotFoundException("Article not found"));
         Optional<Category> category = categoryRepository.findById(downloadedArticle.get().getCategory().getId());
         category.orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         dirLocation =  Paths.get(AppConfig.FILEMAINDIRECTORY+"/"+AppConfig.ARTICLEBASEDIRECTORY+"/"+category.get().getName()).
@@ -242,6 +239,14 @@ public class ArticleServiceImpl  implements ArticleService {
             throw new ResourceNotFoundException("Could not download file");
         }
 
+    }
+
+    @Override
+    public List<Article> getArticlesByCategory(String categoryId) {
+        List<Article> articles = this.articleRepository.findAll().stream().
+                filter(article -> article.getCategory().getId().equals(categoryId)).
+                collect(Collectors.toList());
+        return articles;
     }
 
 }
