@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -48,8 +49,8 @@ public class UserController {
 	@ApiOperation(value = "This method is used to get user details.", authorizations = {
             @Authorization(value = "jwtToken") })
     @GetMapping("/users/user_profile")
-    @ResponseBody
-    public ResponseEntity<?> retrieveUserDetails(Authentication authentication) {
+    public ResponseEntity<?> retrieveUserDetails() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         return new ResponseEntity<>(userService.loadUserDetails(userDetails.getUsername()), HttpStatus.OK);
     }
@@ -59,8 +60,10 @@ public class UserController {
             @Authorization(value = "jwtToken") })
 //	@PreAuthorize("hasRole('ADMIN') or hasRole('READER') or hasRole('PUBLISHER')")
     @PutMapping("/users/user_profile")
-    public ResponseEntity<User> editUserInfo(Authentication authentication, @Valid @RequestBody UserPayload editUserPayload) {
-  		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    public ResponseEntity<User> editUserInfo( @Valid @RequestBody UserPayload editUserPayload) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
 		User editUser = this.modelMapper.map(editUserPayload, User.class);
         User user = userService.loadUserDetails(userDetails.getUsername()).get();
 
