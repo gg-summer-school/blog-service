@@ -2,8 +2,11 @@ package net.gogroups.blogservices.service;
 
 import net.gogroups.blogservices.model.Article;
 import net.gogroups.blogservices.model.User;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface ArticleService {
@@ -20,4 +23,5 @@ public interface ArticleService {
     public List<Article> getAllBoughtArticles(String userId);
     public Article getBoughtArticle(String userId, String articleId);
     public List<Article> searchArticle(String title);
+    public  Resource loadFileAsResource(String articleId);
 }

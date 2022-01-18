@@ -15,4 +15,5 @@ public class SuccessResponse {
 
     private String message;
     private Date timeStamp;
+    private String details;
 }
