@@ -10,6 +10,7 @@ import net.gogroups.blogservices.repository.UserRepository;
 import net.gogroups.blogservices.service.serviceImpl.ArticleServiceImpl;
 import net.gogroups.blogservices.util.ArticleUpload;
 import net.gogroups.blogservices.util.SuccessResponse;
+import net.gogroups.blogservices.util.Util;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -39,7 +40,8 @@ public class ArticleController {
     @Autowired
     UserRepository userRepository;
     private ArticleUpload articleUpload = new ArticleUpload();
-    private AppConfig appConfig = new AppConfig();
+    private Util util = new Util();
+
 
     @PostMapping("protected/publishers/{publisherId}/articles/categories/{categoryId}")
     //@PreAuthorize("hasRole('PUBLISHER')")
@@ -97,9 +99,10 @@ public class ArticleController {
 
     @GetMapping("protected/publishers/{publisherId}/articles")
     //@PreAuthorize("hasRole('PUBLISHER')")
-    public ResponseEntity<List<Article>> getAllArticlesByPublisher(@PathVariable String publisherId){
+    public ResponseEntity<List<ArticleDto>> getAllArticlesByPublisher(@PathVariable String publisherId){
         List<Article> articles = this.articleService.getAllArticlesByPublisher(publisherId);
-        return new ResponseEntity<>(articles, HttpStatus.OK);
+        List<ArticleDto> articleDtos = this.util.convertArticlesToArticleDtos(articles);
+        return new ResponseEntity<>(articleDtos, HttpStatus.OK);
     }
 
     @GetMapping("protected/publisher/{publisherId}/articles/{articleId}/categories/{categoryId}")
@@ -124,10 +127,7 @@ public class ArticleController {
     //@PreAuthorize("hasRole('PUBLISHER') or hasRole('READER') or hasRole('ADMIN')")
     public ResponseEntity<List<ArticleDto>> getPaidArticlesByUser(@PathVariable("userId") String userId){
         List<Article> articles = this.articleService.getAllBoughtArticles(userId);
-        List<ArticleDto> articleDtos = articles.
-                stream().
-                map(article -> this.modelMapper.map(article, ArticleDto.class)).
-                collect(Collectors.toList());
+        List<ArticleDto> articleDtos = this.util.convertArticlesToArticleDtos(articles);
         return new ResponseEntity<>(articleDtos, HttpStatus.OK);
     }
 
@@ -143,15 +143,13 @@ public class ArticleController {
     @GetMapping("public/articles-search")
     public ResponseEntity<List<ArticleDto>> searchArticles(@RequestParam("title") String title){
         List<Article> articles = this.articleService.searchArticle(title);
-        List<ArticleDto> articleDtos = articles.
-                stream().
-                map(article -> this.modelMapper.map(article, ArticleDto.class)).
-                collect(Collectors.toList());
+        List<ArticleDto> articleDtos = this.util.convertArticlesToArticleDtos(articles);
         return new ResponseEntity<>(articleDtos, HttpStatus.OK);
     }
 
     @PostMapping("protected/articles")
-    public ResponseEntity<Resource> downloadFile(@RequestParam("articleId") String articleId,  HttpServletRequest request) throws IOException {
+    public ResponseEntity<Resource> downloadFile(@RequestParam("articleId") String articleId,
+                                                 HttpServletRequest request) throws IOException {
         Resource resource = this.articleService.loadFileAsResource(articleId);
         String contentType;
         contentType  = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
@@ -162,5 +160,12 @@ public class ArticleController {
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
+    }
+
+    @GetMapping("public/articles/categories")
+    public ResponseEntity<List<ArticleDto>> getArticlesByCategories(@RequestParam("categoryId") String categoryId){
+        List<Article> articles = this.articleService.getArticlesByCategory(categoryId);
+        List<ArticleDto> articleDtoList =  this.util.convertArticlesToArticleDtos(articles);
+        return new ResponseEntity<>(articleDtoList, HttpStatus.OK);
     }
 }

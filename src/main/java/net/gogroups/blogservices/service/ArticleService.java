@@ -23,4 +23,6 @@ public interface ArticleService {
     public Article getBoughtArticle(String userId, String articleId);
     public List<Article> searchArticle(String title);
     public  Resource loadFileAsResource(String articleId);
+    public List<Article> getArticlesByCategory(String categoryId);
+
 }
