@@ -1,8 +1,6 @@
 package net.gogroups.blogservices.service.serviceImpl;
 
-
 import net.gogroups.blogservices.exception.ForbiddenException;
-
 import net.gogroups.blogservices.exception.ResourceNotFoundException;
 import net.gogroups.blogservices.exception.UnAuthorizedException;
 import net.gogroups.blogservices.model.Article;
@@ -17,7 +15,6 @@ import net.gogroups.blogservices.service.ArticleService;
 import net.gogroups.blogservices.util.ArticleUpload;
 import net.gogroups.blogservices.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,6 +27,7 @@ import java.util.stream.Collectors;
 @Service
 public class ArticleServiceImpl  implements ArticleService {
 
+
     @Autowired
     ArticleRepository articleRepository;
     @Autowired
@@ -38,12 +36,10 @@ public class ArticleServiceImpl  implements ArticleService {
     CategoryRepository categoryRepository;
     private Util util = new Util();
     private ArticleUpload articleUpload = new ArticleUpload();
-    @Value("${gogroroups.app.articleDocumentDirectoryName}")
-    private String coverPageDir;
-    @Value("${gogroups.app.articleCoverPageDirectoryName}")
-    private String articleDocDir;
     @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
+    ContributorServiceImpl contributorService;
 
 
     @Override
@@ -55,11 +51,18 @@ public class ArticleServiceImpl  implements ArticleService {
         }
         Optional<Category>  category = categoryRepository.findById(categoryId);
         category.orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-        article.setCategory(category.get());
-        article.setId(util.generateId());
-        article.setUser(publisher);
-        Article created = articleRepository.save(article);
-        return created;
+        Article newArticle = new Article();
+        newArticle.setCategory(category.get());
+        newArticle.setId(util.generateId());
+        newArticle.setUser(publisher);
+        newArticle.setArticleAbstract(article.getArticleAbstract());
+        newArticle.setPrice(article.getPrice());
+        newArticle.setTitle(article.getTitle());
+        newArticle.setToc(article.getToc());
+        Article createdArticle = articleRepository.saveAndFlush(newArticle);
+        this.contributorService.addContributors(article.getContributors(), createdArticle.getId());
+        return createdArticle;
+
     }
 
 
@@ -104,6 +107,7 @@ public class ArticleServiceImpl  implements ArticleService {
                 stream().filter((article -> article.getUser().getId().equals(authUser.getId()))).
                 collect(Collectors.toList());
         return articles;
+
     }
 
     @Override
@@ -126,24 +130,28 @@ public class ArticleServiceImpl  implements ArticleService {
         return article.get();
     }
 
+
+
+
     @Override
     public User getUserByToken(String userId){
         Optional<User> user =  userRepository.findById(userId);
-        user.orElseThrow(() -> new UnAuthorizedException("Authorized"));
+        user.orElseThrow(() -> new UnAuthorizedException("Invalid user id"));
         return user.get();
     }
 
     @Override
     public void uploadArticleWithCoverPageImage(String articleId,  MultipartFile coverPage, MultipartFile document) {
+        String articleCover = "coverPage";
+        String doc = "article";
         Optional<Article>  article = articleRepository.findById(articleId);
         article.orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         Category category = article.get().getCategory();
         article.get().setCoverPage(StringUtils.cleanPath(coverPage.getOriginalFilename()));
         article.get().setDocument(StringUtils.cleanPath(document.getOriginalFilename()));
         articleRepository.save(article.get());
-        System.out.println(this.coverPageDir);
-        this.articleUpload.uploadFile(category, this.coverPageDir, coverPage);
-        this.articleUpload.uploadFile(category, this.articleDocDir, document);
+        this.articleUpload.uploadFile(category, articleCover, coverPage);
+        this.articleUpload.uploadFile(category, doc, document);
     }
 
     @Override
@@ -155,7 +163,7 @@ public class ArticleServiceImpl  implements ArticleService {
         List<Article> articles = new ArrayList<>();
         if(!transactions.isEmpty()){
             transactions.stream().forEach((transaction -> {
-                Article article = this.getBoughtArticle(userId, transaction.getId());
+                Article article = this.getBoughtArticle(userId, transaction.getArticle().getId());
                 articles.add(article);
             }));
         }
@@ -164,11 +172,21 @@ public class ArticleServiceImpl  implements ArticleService {
 
     @Override
     public Article getBoughtArticle(String userId, String articleId) {
-        Optional<Transaction> transaction = transactionRepository.findAll().stream().filter((transaction1 -> transaction1.getUser().getId().equals(userId))).findFirst();
+        Optional<Transaction> transaction = this.transactionRepository.
+                findAll().
+                stream().
+                filter((transaction1 -> transaction1.getUser().getId().equals(userId))).
+                findFirst();
         transaction.orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        Article article = articleRepository.findById(articleId).get();
+        Article article = this.articleRepository.findById(articleId).get();
         return article;
 
+    }
+
+    @Override
+    public List<Article> searchArticle(String title) {
+        List<Article> articles = this.articleRepository.findByTitle(title);
+        return articles;
     }
 
 }

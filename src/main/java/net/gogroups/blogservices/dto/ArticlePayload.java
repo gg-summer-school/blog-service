@@ -9,6 +9,7 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,7 +33,8 @@ public class ArticlePayload {
     @DecimalMin(value = "1.0")
     private BigDecimal price;
 
+    private List<ContributorPayload> contributors;
 
-    private String coverPage;
-    private String document;
+
+
 }
