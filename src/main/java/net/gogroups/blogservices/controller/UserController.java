@@ -147,7 +147,7 @@ public class UserController {
 		
 		String message = payForArticle.getNameOfArticle() + " payed successfully " + "with Id " + payForArticle.getId();
 		
-		return new ResponseEntity<>(new SuccessResponse(message, new Date()), HttpStatus.CREATED);
+		return new ResponseEntity<>(new SuccessResponse(message, new Date(), ""), HttpStatus.CREATED);
 	}
 	
 //	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER') or hasRole('ADMIN')")
