@@ -1,5 +1,6 @@
 package net.gogroups.blogservices.service.serviceImpl;
 
+import net.gogroups.blogservices.config.AppConfig;
 import net.gogroups.blogservices.exception.ForbiddenException;
 import net.gogroups.blogservices.exception.ResourceNotFoundException;
 import net.gogroups.blogservices.exception.UnAuthorizedException;
@@ -15,10 +16,15 @@ import net.gogroups.blogservices.service.ArticleService;
 import net.gogroups.blogservices.util.ArticleUpload;
 import net.gogroups.blogservices.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +32,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class ArticleServiceImpl  implements ArticleService {
-
 
     @Autowired
     ArticleRepository articleRepository;
@@ -40,6 +45,9 @@ public class ArticleServiceImpl  implements ArticleService {
     private TransactionRepository transactionRepository;
     @Autowired
     ContributorServiceImpl contributorService;
+    AppConfig appConfig = new AppConfig();
+
+
 
 
     @Override
@@ -64,8 +72,6 @@ public class ArticleServiceImpl  implements ArticleService {
         return createdArticle;
 
     }
-
-
 
     @Override
     public boolean checkIfUserIsActive(String userId) {
@@ -130,9 +136,6 @@ public class ArticleServiceImpl  implements ArticleService {
         return article.get();
     }
 
-
-
-
     @Override
     public User getUserByToken(String userId){
         Optional<User> user =  userRepository.findById(userId);
@@ -187,6 +190,32 @@ public class ArticleServiceImpl  implements ArticleService {
     public List<Article> searchArticle(String title) {
         List<Article> articles = this.articleRepository.findByTitle(title);
         return articles;
+    }
+
+
+    @Override
+    public Resource loadFileAsResource(String articleId) {
+        Path dirLocation;
+        Optional<Article> downloadedArticle = this.articleRepository.findById(articleId);
+        downloadedArticle.orElseThrow(() -> new ResourceNotFoundException("article not found"));
+        Optional<Category> category = categoryRepository.findById(downloadedArticle.get().getCategory().getId());
+        category.orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+        dirLocation =  Paths.get(this.appConfig.getFilesMainDirectory()+"/"+this.appConfig.getArticlesBaseDirectory()+"/"+category.get().getName()).
+                toAbsolutePath().normalize();
+        try {
+            Path file = dirLocation.resolve(downloadedArticle.get().getDocument()).normalize();
+            Resource resource = new UrlResource(file.toUri());
+            if (resource.exists() || resource.isReadable()) {
+                return resource;
+            }
+            else {
+                throw new ResourceNotFoundException("Could not find file");
+            }
+        }
+        catch (MalformedURLException e) {
+            throw new ResourceNotFoundException("Could not download file");
+        }
+
     }
 
 }
