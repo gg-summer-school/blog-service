@@ -1,20 +1,17 @@
 package net.gogroups.blogservices.model;
 
 
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.persistence.*;
 import java.util.List;
 
-
-@NoArgsConstructor
-@Getter
-@Setter
-@Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
 public class Role {
     @Id
     @Column(length = 50)

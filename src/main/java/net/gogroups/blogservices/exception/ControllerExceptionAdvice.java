@@ -48,9 +48,9 @@ public class ControllerExceptionAdvice  extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-//    @ExceptionHandler(UnAuthorizedException.class)
-//    public ResponseEntity<Object> handleUnAuthorizedException(Exception exception, WebRequest webRequest){
-//        ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage(), webRequest.getDescription(false), new Date());
-//        return new ResponseEntity<>(exceptionResponse, HttpStatus.UNAUTHORIZED);
-//    }
+    @ExceptionHandler(UnAuthorizedException.class)
+    public ResponseEntity<Object> handleUnAuthorizedException(Exception exception, WebRequest webRequest){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage(), webRequest.getDescription(false), new Date());
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.UNAUTHORIZED);
+    }
 }

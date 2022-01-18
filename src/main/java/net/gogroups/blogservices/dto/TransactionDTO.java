@@ -15,18 +15,12 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ArticleDto {
+public class TransactionDTO {
 
-    private String id;
-    private String title;
-    private String articleAbstract;
-    private String toc;
-    private String coverPage;
-    private String document;
-    private BigDecimal price;
-    private String  userId;
-    private String categoryId;
+	private String id;
+    private String nameOfArticle;
+    private String userId;
+    private String articleId;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
 }

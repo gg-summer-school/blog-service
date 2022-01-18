@@ -12,9 +12,8 @@ public class UserDTO {
 	 private String id;
 	 private String name;
 	 private String email;
-	 private String password;
-	 private boolean active = true;
-	 private boolean isApproved = false;
-	 private List<Role> role;
+	 private boolean active;
+	 private boolean isApproved;
+//	 private List<Role> role;
 	
 }

@@ -59,7 +59,7 @@ public class ArticleController {
                                         @RequestPart("document") MultipartFile document){
         this.articleService.uploadArticleWithCoverPageImage(articleId, coverPage, document);
 
-        return new ResponseEntity<>(new SuccessResponse("Files uploaded successfuly", new Date(), ""), HttpStatus.OK);
+        return new ResponseEntity<>(new SuccessResponse("Files uploaded successfully", new Date(), ""), HttpStatus.OK);
     }
 
     @PutMapping("protected/publishers/{publisherId}/articles/{articleId}/categories/{categoryId}")
