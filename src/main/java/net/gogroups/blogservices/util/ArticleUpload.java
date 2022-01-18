@@ -16,17 +16,17 @@ import java.nio.file.StandardCopyOption;
 
 public class ArticleUpload {
 
-    @Autowired
-    AppConfig appConfig = new AppConfig();
+//    @Autowired
+//    AppConfig appConfig = new AppConfig();
 
     public void uploadFile(Category category, String fileType,  MultipartFile file)  {
-        this.appConfig.setupFilesBaseDirectories();
+        AppConfig.setupFilesBaseDirectories();
         InputStream inputStream = null;
         Path  uploadDocDir = null;
         if(fileType.equals("coverPage")){
-            uploadDocDir = Paths.get(this.appConfig.getFilesMainDirectory()+ "/"+this.appConfig.getArticlesCoverPageBaseDirectory() +"/" + category.getName());
+            uploadDocDir = Paths.get(AppConfig.FILEMAINDIRECTORY+ "/"+AppConfig.ARTICLECOVERPAGEBASEDIRECTORY +"/" + category.getName());
         }else if(fileType.equals("article")){
-            uploadDocDir = Paths.get(this.appConfig.getFilesMainDirectory()+ "/"+this.appConfig.getArticlesBaseDirectory()+"/"+category.getName());
+            uploadDocDir = Paths.get(AppConfig.FILEMAINDIRECTORY+ "/"+AppConfig.ARTICLEBASEDIRECTORY+"/"+category.getName());
         }
         if(!Files.exists(uploadDocDir)){
             try {

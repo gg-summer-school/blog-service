@@ -1,7 +1,9 @@
 package net.gogroups.blogservices.controller;
 
+import net.gogroups.blogservices.config.AppConfig;
 import net.gogroups.blogservices.dto.ArticleDto;
 import net.gogroups.blogservices.dto.ArticlePayload;
+import net.gogroups.blogservices.dto.ArticleResponse;
 import net.gogroups.blogservices.dto.UpdateArticlePayload;
 import net.gogroups.blogservices.model.Article;
 import net.gogroups.blogservices.repository.UserRepository;
@@ -36,8 +38,8 @@ public class ArticleController {
     private ModelMapper modelMapper;
     @Autowired
     UserRepository userRepository;
-
     private ArticleUpload articleUpload = new ArticleUpload();
+    private AppConfig appConfig = new AppConfig();
 
     @PostMapping("protected/publishers/{publisherId}/articles/categories/{categoryId}")
     //@PreAuthorize("hasRole('PUBLISHER')")
@@ -83,23 +85,21 @@ public class ArticleController {
 
     @GetMapping("public/articles")
     //@PreAuthorize("hasRole('PUBLISHER') or hasRole('ADMIN') or hasRole('READER')")
-    public ResponseEntity<List<ArticleDto>> getAllArticles(){
-        List<Article> articles = this.articleService.getAllArticles();
-        List<ArticleDto> articleDtos =  articles.
-                stream().map((article -> this.modelMapper.map(article,ArticleDto.class))).
-                collect(Collectors.toList());
-        return new ResponseEntity<>(articleDtos, HttpStatus.OK);
+    public ResponseEntity<ArticleResponse> getAllArticles(
+            @RequestParam(value = "pageNo", defaultValue = AppConfig.PAGENUMBER, required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = AppConfig.PAGESIZE, required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConfig.SORTBY, required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = AppConfig.SORTDIRECTION, required = false) String sortDir
+            ){
+        ArticleResponse articleResponses = this.articleService.getAllArticles(pageNo, pageSize,  sortBy, sortDir);
+        return new ResponseEntity<>(articleResponses, HttpStatus.OK);
     }
 
     @GetMapping("protected/publishers/{publisherId}/articles")
     //@PreAuthorize("hasRole('PUBLISHER')")
-    public ResponseEntity<List<ArticleDto>> getAllArticlesByPublisher(@PathVariable String publisherId){
+    public ResponseEntity<List<Article>> getAllArticlesByPublisher(@PathVariable String publisherId){
         List<Article> articles = this.articleService.getAllArticlesByPublisher(publisherId);
-        List<ArticleDto> articleDtos = articles.
-                stream().map((article -> this.modelMapper.map(article, ArticleDto.class))).
-                collect(Collectors.toList());
-
-        return new ResponseEntity<>(articleDtos, HttpStatus.OK);
+        return new ResponseEntity<>(articles, HttpStatus.OK);
     }
 
     @GetMapping("protected/publisher/{publisherId}/articles/{articleId}/categories/{categoryId}")

@@ -1,5 +1,6 @@
 package net.gogroups.blogservices.service;
 
+import net.gogroups.blogservices.dto.ArticleResponse;
 import net.gogroups.blogservices.model.Article;
 import net.gogroups.blogservices.model.User;
 import org.springframework.core.io.Resource;
@@ -12,7 +13,7 @@ public interface ArticleService {
     public boolean checkIfUserIsActive( String userId);
     public Article editArticle(String articleId, String categoryId, String publisherId, Article article);
     public void deleteArticle(String articleId, String categoryId, String publisherId);
-    public List<Article> getAllArticles();
+    public ArticleResponse getAllArticles(int pageNo, int pageSize, String sortBy, String sortDir);
     public List<Article> getAllArticlesByPublisher(String userId);
     public Article  getArticleByPublisher(String articleId, String categoryId, String userId);
     public Article getSingleArticle(String articleId);

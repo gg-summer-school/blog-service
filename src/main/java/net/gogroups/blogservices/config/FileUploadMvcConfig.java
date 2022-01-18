@@ -13,15 +13,14 @@ import java.nio.file.Paths;
 public class FileUploadMvcConfig implements WebMvcConfigurer {
 
 
-    @Autowired
-    AppConfig appConfig = new AppConfig();
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        Path uploadCoverPageDir = Paths.get(this.appConfig.getFilesMainDirectory()+"/"+this.appConfig.getArticlesCoverPageBaseDirectory());
-        Path uploadDocDir = Paths.get(this.appConfig.getFilesMainDirectory()+"/"+this.appConfig.getArticlesBaseDirectory());
+        Path uploadCoverPageDir = Paths.get(AppConfig.FILEMAINDIRECTORY+"/"+AppConfig.ARTICLECOVERPAGEBASEDIRECTORY);
+        Path uploadDocDir = Paths.get(AppConfig.FILEMAINDIRECTORY+"/"+AppConfig.ARTICLEBASEDIRECTORY);
         String uploadCoverPagePath = uploadCoverPageDir.toFile().getAbsolutePath();
         String uploadDocPath = uploadDocDir.toFile().getAbsolutePath();
-        registry.addResourceHandler(this.appConfig.getFilesMainDirectory()+"/"+this.appConfig.getArticlesCoverPageBaseDirectory()+"/**").addResourceLocations("file:/"+ uploadCoverPagePath + "/");
-        registry.addResourceHandler(this.appConfig.getFilesMainDirectory()+"/"+this.appConfig.getArticlesBaseDirectory()+"/**").addResourceLocations("file:/"+ uploadDocPath + "/");
+        registry.addResourceHandler(AppConfig.FILEMAINDIRECTORY+"/"+AppConfig.ARTICLECOVERPAGEBASEDIRECTORY+"/**").addResourceLocations("file:/"+ uploadCoverPagePath + "/");
+        registry.addResourceHandler(AppConfig.FILEMAINDIRECTORY+"/"+AppConfig.ARTICLECOVERPAGEBASEDIRECTORY+"/**").addResourceLocations("file:/"+ uploadDocPath + "/");
     }
 }
