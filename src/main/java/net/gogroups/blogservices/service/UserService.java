@@ -1,12 +1,20 @@
 package net.gogroups.blogservices.service;
 
 import java.util.List;
+import java.util.Optional;
+
+import net.gogroups.blogservices.model.Transaction;
+import net.gogroups.blogservices.model.User;
 
 import net.gogroups.blogservices.model.Article;
 import net.gogroups.blogservices.model.Transaction;
 import net.gogroups.blogservices.model.User;
 
 public interface UserService {
+
+     User saveUser(User user);
+
+     Optional<User> loadUserDetails(String email);
 	
 	List<User> getAllUsers();
 	

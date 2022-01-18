@@ -19,7 +19,7 @@ import net.gogroups.blogservices.service.CategoryService;
 @RequestMapping("/api/")
 @RestController
 @RequiredArgsConstructor
-public class CateogoryController {
+public class CategoryController {
 	
 	private final CategoryService categoryService;
 	

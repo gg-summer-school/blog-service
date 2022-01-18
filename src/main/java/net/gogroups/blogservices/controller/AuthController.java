@@ -1,5 +1,6 @@
 package net.gogroups.blogservices.controller;
 
+import io.swagger.annotations.ApiOperation;
 import net.gogroups.blogservices.exception.TokenRefreshException;
 import net.gogroups.blogservices.model.ERole;
 import net.gogroups.blogservices.model.RefreshToken;
@@ -16,6 +17,7 @@ import net.gogroups.blogservices.repository.UserRepository;
 import net.gogroups.blogservices.security.service.RefreshTokenService;
 import net.gogroups.blogservices.security.service.UserDetailsImpl;
 import net.gogroups.blogservices.security.jwt.JwtUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,6 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.security.auth.login.AccountNotFoundException;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +38,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/public/auth")
 public class AuthController {
+
     @Autowired
     AuthenticationManager authenticationManager;
 
@@ -54,26 +58,28 @@ public class AuthController {
     RefreshTokenService refreshTokenService;
 
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest)
+            throws AccountNotFoundException {
 
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        String jwt = jwtUtils.generateJwtToken(authentication);
+        String jwt = jwtUtils.generateJwtToken(userDetails);
 
         List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getUserId());
 
-        return ResponseEntity.ok(new JwtResponse(jwt, refreshToken.getToken(), userDetails.getId(),
-                userDetails.getEmail(), roles));
+        return ResponseEntity.ok(new JwtResponse(jwt, refreshToken.getToken(), userDetails.getUserId(),
+                userDetails.getName(),  userDetails.getEmail(), roles));
     }
 
+    @ApiOperation(value = "For the refresh token")
     @PostMapping("/refreshtoken")
     public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
         String requestRefreshToken = request.getRefreshToken();
@@ -98,23 +104,21 @@ public class AuthController {
         // Create new user's account
         String strRoles = signUpRequest.getRole();
         List<Role> roles = new ArrayList<>();
-        System.out.println(strRoles);
 
-        if(strRoles == "PUBLISHER") {
-            Role userRole = roleRepository.findByRole(ERole.PUBLISHER);
-//                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-            roles.add(userRole);
-        } else {
-            Role userRole = roleRepository.findByRole(ERole.READER);
-//                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-            roles.add(userRole);
-        }
         User user = new User(UUID.randomUUID().toString(),
                 signUpRequest.getEmail(),
                 signUpRequest.getName(),
                 encoder.encode(signUpRequest.getPassword()),
                 true,
                 false);
+
+        if(strRoles.equals("PUBLISHER")) {
+            Role userRole = roleRepository.findByRole(ERole.PUBLISHER);
+            roles.add(userRole);
+        } else {
+            Role userRole = roleRepository.findByRole(ERole.READER);
+            roles.add(userRole);
+        }
 
         user.setRole(roles);
 
