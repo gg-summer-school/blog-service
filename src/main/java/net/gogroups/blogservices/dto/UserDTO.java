@@ -4,7 +4,9 @@ import java.util.List;
 
 import lombok.*;
 import net.gogroups.blogservices.model.*;
-@Data
+
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDTO {
@@ -14,6 +16,6 @@ public class UserDTO {
 	 private String email;
 	 private boolean active;
 	 private boolean isApproved;
-//	 private List<Role> role;
-	
+	 private List<Role> role;
+
 }
