@@ -1,19 +1,25 @@
 package net.gogroups.blogservices.security.service;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.gogroups.blogservices.model.User;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class UserDetailsImpl implements UserDetails {
+import lombok.Getter;
+import net.gogroups.blogservices.model.User;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-    private String id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+@Getter
+public class UserDetailsImpl implements UserDetails {
+    private static final long serialVersionUID = 1L;
+
+    private String userId;
+
+    private String name;
 
     private String email;
 
@@ -22,9 +28,13 @@ public class UserDetailsImpl implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(String id, String email, String password,
+
+
+    public UserDetailsImpl(String userId, String name,  String email, String password,
                            Collection<? extends GrantedAuthority> authorities) {
-        this.id = id;
+        super();
+        this.userId = userId;
+        this.name = name;
         this.email = email;
         this.password = password;
         this.authorities = authorities;
@@ -37,34 +47,16 @@ public class UserDetailsImpl implements UserDetails {
 
         return new UserDetailsImpl(
                 user.getId(),
+                user.getName(),
                 user.getEmail(),
                 user.getPassword(),
                 authorities);
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getEmail() {
+    public String getUsername() {
         return email;
     }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return null;
-    }
-
 
     @Override
     public boolean isAccountNonExpired() {
@@ -93,6 +85,6 @@ public class UserDetailsImpl implements UserDetails {
         if (o == null || getClass() != o.getClass())
             return false;
         UserDetailsImpl user = (UserDetailsImpl) o;
-        return Objects.equals(id, user.id);
+        return Objects.equals(userId, user.userId);
     }
 }

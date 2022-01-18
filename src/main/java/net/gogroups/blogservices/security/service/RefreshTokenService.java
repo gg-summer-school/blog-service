@@ -7,7 +7,6 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import net.gogroups.blogservices.exception.TokenRefreshException;
 import net.gogroups.blogservices.model.RefreshToken;
@@ -30,7 +29,7 @@ public class RefreshTokenService {
         return refreshTokenRepo.findByToken(token);
     }
 
-    public RefreshToken createRefreshToken(String userId) {
+    public RefreshToken createRefreshToken(String  userId) {
         RefreshToken refreshToken = new RefreshToken();
 
         refreshToken.setUser(userRepo.findById(userId).get());
@@ -48,10 +47,5 @@ public class RefreshTokenService {
         }
 
         return token;
-    }
-
-    @Transactional
-    public int deleteByUserId(String userId) {
-        return refreshTokenRepo.deleteByUser(userRepo.findById(userId).get());
     }
 }

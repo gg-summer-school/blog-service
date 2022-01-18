@@ -42,7 +42,6 @@ public class User {
         this.password = password;
         this.active = active;
         this.isApproved = isApproved;
-        this.role = role;
     }
 
 

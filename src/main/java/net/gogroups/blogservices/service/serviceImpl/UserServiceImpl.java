@@ -1,29 +1,28 @@
 package net.gogroups.blogservices.service.serviceImpl;
 
-import java.util.List;
-import java.util.Optional;
-
+import net.gogroups.blogservices.model.User;
+import net.gogroups.blogservices.repository.UserRepository;
+import net.gogroups.blogservices.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 import net.gogroups.blogservices.exception.ForbiddenException;
 import net.gogroups.blogservices.exception.ResourceNotFoundException;
 import net.gogroups.blogservices.model.Article;
 import net.gogroups.blogservices.model.ERole;
 import net.gogroups.blogservices.model.Transaction;
-import net.gogroups.blogservices.model.User;
 import net.gogroups.blogservices.repository.ArticleRepository;
 import net.gogroups.blogservices.repository.TransactionRepository;
-import net.gogroups.blogservices.repository.UserRepository;
-import net.gogroups.blogservices.service.UserService;
 import net.gogroups.blogservices.util.Util;
 
 @Service
-public class UserServiceImpl implements UserService{
-	
-	@Autowired
-	public UserRepository userRepository;
-	
+public class UserServiceImpl implements UserService {
+    @Autowired
+    UserRepository userRepository;
+
 	@Autowired
 	public ArticleRepository articleRepository;
 	
@@ -31,6 +30,16 @@ public class UserServiceImpl implements UserService{
 	public TransactionRepository transactionRepository;
 	
 	private Util util = new Util();
+
+	@Override
+	public User saveUser(User user) {
+		return userRepository.save(user);
+	}
+
+	@Override
+	public Optional<User> loadUserDetails(String email) {
+		return userRepository.findByEmail(email);
+	}
 
 	@Override
 	public List<User> getAllUsers() {
