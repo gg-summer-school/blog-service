@@ -16,7 +16,6 @@ import java.math.BigDecimal;
 public class ApproveUserPayload {
 
     @NotNull
-    @NotBlank
     private boolean isApproved;
 
 }

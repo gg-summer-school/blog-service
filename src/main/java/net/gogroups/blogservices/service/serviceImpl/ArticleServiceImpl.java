@@ -1,6 +1,8 @@
 package net.gogroups.blogservices.service.serviceImpl;
 
 import net.gogroups.blogservices.config.AppConfig;
+import net.gogroups.blogservices.dto.ArticleDto;
+import net.gogroups.blogservices.dto.ArticleResponse;
 import net.gogroups.blogservices.exception.ForbiddenException;
 import net.gogroups.blogservices.exception.ResourceNotFoundException;
 import net.gogroups.blogservices.exception.UnAuthorizedException;
@@ -15,12 +17,17 @@ import net.gogroups.blogservices.repository.UserRepository;
 import net.gogroups.blogservices.service.ArticleService;
 import net.gogroups.blogservices.util.ArticleUpload;
 import net.gogroups.blogservices.util.Util;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.net.MalformedURLException;
 import java.nio.file.Path;
@@ -46,6 +53,8 @@ public class ArticleServiceImpl  implements ArticleService {
     @Autowired
     ContributorServiceImpl contributorService;
     AppConfig appConfig = new AppConfig();
+    @Autowired
+    private ModelMapper modelMapper;
 
 
 
@@ -102,18 +111,35 @@ public class ArticleServiceImpl  implements ArticleService {
     }
 
     @Override
-    public List<Article> getAllArticles() {
-        return articleRepository.findAll();
+    public ArticleResponse getAllArticles(int pageNo, int pageSize, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        Page<Article> articles = articleRepository.findAll(pageable);
+        List<Article> articleList = articles.getContent();
+        List<ArticleDto> articleDtos = articleList.
+                stream().map(article -> this.modelMapper.map(article, ArticleDto.class)).
+                collect(Collectors.toList());
+        ArticleResponse articleResponse = new ArticleResponse();
+        articleResponse.setArticleDtoList(articleDtos);
+        articleResponse.setPageNo(articles.getNumber());
+        articleResponse.setPageSize(articles.getSize());
+        articleResponse.setTotalElements(articleResponse.getTotalElements());
+        articleResponse.setTotalPages(articleResponse.getTotalPages());
+        articleResponse.setLast(articles.isLast());
+        return articleResponse;
     }
 
     @Override
     public List<Article> getAllArticlesByPublisher(String userId) {
         User authUser =  this.getUserByToken(userId);
-        List<Article> articles = articleRepository.findAll().
-                stream().filter((article -> article.getUser().getId().equals(authUser.getId()))).
-                collect(Collectors.toList());
-        return articles;
-
+        if(!authUser.isApproved()){
+           throw new ForbiddenException("Publisher account is not yet approve");
+        }
+        List<Article> articles = articleRepository.findAll();
+                articles.stream().filter((article -> article.getUser().getId().equals(authUser.getId()))).
+                        collect(Collectors.toList());
+        return null;
     }
 
     @Override
@@ -200,7 +226,7 @@ public class ArticleServiceImpl  implements ArticleService {
         downloadedArticle.orElseThrow(() -> new ResourceNotFoundException("article not found"));
         Optional<Category> category = categoryRepository.findById(downloadedArticle.get().getCategory().getId());
         category.orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-        dirLocation =  Paths.get(this.appConfig.getFilesMainDirectory()+"/"+this.appConfig.getArticlesBaseDirectory()+"/"+category.get().getName()).
+        dirLocation =  Paths.get(AppConfig.FILEMAINDIRECTORY+"/"+AppConfig.ARTICLEBASEDIRECTORY+"/"+category.get().getName()).
                 toAbsolutePath().normalize();
         try {
             Path file = dirLocation.resolve(downloadedArticle.get().getDocument()).normalize();

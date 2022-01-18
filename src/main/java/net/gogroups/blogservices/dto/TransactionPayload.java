@@ -16,7 +16,6 @@ import java.math.BigDecimal;
 public class TransactionPayload {
 
 	@NotNull
-    @NotBlank
     private String nameOfArticle;
 
 }
