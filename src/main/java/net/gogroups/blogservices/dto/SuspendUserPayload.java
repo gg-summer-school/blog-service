@@ -16,7 +16,6 @@ import java.math.BigDecimal;
 public class SuspendUserPayload {
 
     @NotNull
-    @NotBlank
     private boolean active;
 
 }
