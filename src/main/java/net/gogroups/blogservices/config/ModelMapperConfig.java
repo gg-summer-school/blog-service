@@ -1,0 +1,21 @@
+package net.gogroups.blogservices.config;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
+
+import java.nio.file.Path;
+
+@Component
+public class ModelMapperConfig {
+
+    @Bean
+    public ModelMapper modelMapper(){
+        ModelMapper modelMapper = new ModelMapper();
+        return modelMapper;
+    }
+    
+
+
+
+}
