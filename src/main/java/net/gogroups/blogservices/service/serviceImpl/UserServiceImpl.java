@@ -3,11 +3,14 @@ package net.gogroups.blogservices.service.serviceImpl;
 import net.gogroups.blogservices.model.User;
 import net.gogroups.blogservices.repository.UserRepository;
 import net.gogroups.blogservices.service.UserService;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import net.gogroups.blogservices.exception.ForbiddenException;
 import net.gogroups.blogservices.exception.ResourceNotFoundException;
@@ -30,10 +33,13 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	public TransactionRepository transactionRepository;
 	
+	@Autowired
+	ModelMapper modelMapper;
+	
 	private Util util = new Util();
 
 	@Override
-	public User saveUser(User user) {
+	public User editUser(User user) {
 		return userRepository.save(user);
 	}
 
@@ -43,13 +49,33 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<User> getAllUsers() {
+	public List<User> getAllReaders() {
+
 		
-		List<User> findAllUsers = userRepository.findAll();
-		if(findAllUsers.isEmpty()) {
+		List<User> findAllReaders = userRepository.findAll()
+				.stream()
+				.filter(reader -> reader.getRole().equals("READER"))
+				.collect(Collectors.toList());
+		
+		if(findAllReaders.isEmpty()) {
 			throw new ResourceNotFoundException("No Users Found");
 		}
-		return findAllUsers;
+		return findAllReaders;
+	}
+	
+	@Override
+	public List<User> getAllPublishers(boolean approved) {
+		
+		List<User> user = userRepository.findAll()
+				.stream()
+				.filter(publisher -> publisher.isApproved() == approved)
+				.collect(Collectors.toList());
+		
+		if(user.isEmpty()) {
+			throw new ResourceNotFoundException("No Users found");
+		}
+		
+		return user;
 	}
 	
 	@Override
@@ -74,11 +100,6 @@ public class UserServiceImpl implements UserService {
 		if(!userId.isPresent()) {
 			throw new ResourceNotFoundException("User not found with id- "+ user_id);
 		}
-		
-//		if(!userId.get().getRole().contains(ERole.PUBLISHER)) {
-//			throw new ForbiddenException("User "+ userId.get().getName() +" is not a Publisher");
-//
-//		}
 			
 		if(userId.get().isApproved()) {
 			return "Publisher "+ userId.get().getName() +" is already approved";
@@ -169,6 +190,7 @@ public class UserServiceImpl implements UserService {
 		}
 		return allTransactionsOfAUser;	
 		}
+
 
 
 }

@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.List;
 
 @Data
@@ -21,6 +24,7 @@ public class Role {
     @Enumerated(EnumType.STRING)
     private ERole role;
 
+    @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "role")
     private List<User> user;
 
