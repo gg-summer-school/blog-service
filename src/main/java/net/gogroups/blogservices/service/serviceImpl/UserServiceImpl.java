@@ -8,14 +8,17 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import net.gogroups.blogservices.exception.ForbiddenException;
 import net.gogroups.blogservices.exception.ResourceNotFoundException;
 import net.gogroups.blogservices.model.Article;
 import net.gogroups.blogservices.model.ERole;
+import net.gogroups.blogservices.model.Role;
 import net.gogroups.blogservices.model.Transaction;
 import net.gogroups.blogservices.repository.ArticleRepository;
 import net.gogroups.blogservices.repository.TransactionRepository;
@@ -50,24 +53,41 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<User> getAllReaders() {
-
 		
-		List<User> findAllReaders = userRepository.findAll()
-				.stream()
-				.filter(reader -> reader.getRole().equals("READER"))
-				.collect(Collectors.toList());
+		List<User> readers = new ArrayList<>();
 		
-		if(findAllReaders.isEmpty()) {
+		List<User> findAllReaders = userRepository.findAll();
+				for(User user:findAllReaders) {
+					for(Role role: user.getRole()) {
+						if(role.getRole().equals(ERole.READER)) {
+							readers.add(user);
+						}
+					}
+				}
+				
+		if(readers.isEmpty()) {
 			throw new ResourceNotFoundException("No Users Found");
 		}
-		return findAllReaders;
+		
+		return readers;
+		
 	}
 	
 	@Override
 	public List<User> getAllPublishers(boolean approved) {
 		
-		List<User> user = userRepository.findAll()
-				.stream()
+		List<User> publishers = new ArrayList<>();
+		
+		List<User> findAllPublishers = userRepository.findAll();
+				for(User user:findAllPublishers) {
+					for(Role role: user.getRole()) {
+						if(role.getRole().equals(ERole.PUBLISHER)) {
+							publishers.add(user);
+						}
+					}
+				}
+		
+				List<User> user = publishers.stream()
 				.filter(publisher -> publisher.isApproved() == approved)
 				.collect(Collectors.toList());
 		
