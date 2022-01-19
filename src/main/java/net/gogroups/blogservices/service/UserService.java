@@ -12,11 +12,13 @@ import net.gogroups.blogservices.model.User;
 
 public interface UserService {
 
-     User editUser(User user);
+    User editUser(User user);
 
-     Optional<User> loadUserDetails(String email);
+    Optional<User> loadUserDetails(String email);
 	
-	List<User> getAllUsers();
+	List<User> getAllReaders();
+	
+	List<User> getAllPublishers(boolean isApproved);
 	
 	User getAUser(String user_id);
 	

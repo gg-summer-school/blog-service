@@ -9,20 +9,23 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-@Getter
+
 @Configuration
 public class AppConfig {
 
-    private final String filesMainDirectory = "uploads";
+	public static final String FILEMAINDIRECTORY = "uploads";
+	public static  final String ARTICLECOVERPAGEBASEDIRECTORY  = "coverPages";
+	public static final String ARTICLEBASEDIRECTORY  = "articles";
+	public static  final String SORTBY = "title";
+	public static final String SORTDIRECTION = "asc";
+	public static final String PAGENUMBER = "0";
+	public static final String PAGESIZE = "10";
 
-    private final  String articlesCoverPageBaseDirectory = "coverPages";
 
-	private final String articlesBaseDirectory = "articles";
-
-	public void setupFilesBaseDirectories(){
-		Path uploads = Paths.get(this.filesMainDirectory);
-		Path coverPagePath = Paths.get(this.filesMainDirectory + "/" +this.articlesCoverPageBaseDirectory);
-		Path articlesPath = Paths.get(this.filesMainDirectory + "/"+ this.articlesBaseDirectory);
+	public static  void setupFilesBaseDirectories(){
+		Path uploads = Paths.get(FILEMAINDIRECTORY);
+		Path coverPagePath = Paths.get(FILEMAINDIRECTORY + "/" + ARTICLECOVERPAGEBASEDIRECTORY);
+		Path articlesPath = Paths.get(FILEMAINDIRECTORY + "/"+ ARTICLEBASEDIRECTORY);
 		if(!Files.exists(uploads)){
 			try {
 				Files.createDirectory(uploads);

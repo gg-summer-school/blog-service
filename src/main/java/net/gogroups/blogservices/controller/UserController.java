@@ -13,7 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -37,6 +39,9 @@ public class UserController {
     
 	@Autowired
 	UserService userService;
+
+	@Autowired
+	PasswordEncoder encoder;
     
 	 @Autowired
 	 private ModelMapper modelMapper;
@@ -44,8 +49,8 @@ public class UserController {
 	@ApiOperation(value = "This method is used to get user details.", authorizations = {
             @Authorization(value = "jwtToken") })
     @GetMapping("/users/user_profile")
-    @ResponseBody
-    public ResponseEntity<?> retrieveUserDetails(Authentication authentication) {
+    public ResponseEntity<?> retrieveUserDetails() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         return new ResponseEntity<>(userService.loadUserDetails(userDetails.getUsername()), HttpStatus.OK);
     }
@@ -53,17 +58,19 @@ public class UserController {
 
     @ApiOperation(value = "This method is used to get edit user details.", authorizations = {
             @Authorization(value = "jwtToken") })
-	@PreAuthorize("hasRole('ADMIN') or hasRole('READER') or hasRole('PUBLISHER')")
+//	@PreAuthorize("hasRole('ADMIN') or hasRole('READER') or hasRole('PUBLISHER')")
     @PutMapping("/users/user_profile")
-    public ResponseEntity<User> editUserInfo(Authentication authentication, @Valid @RequestBody UserPayload editUserPayload) {
-  		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-		User editUser = modelMapper.map(editUserPayload, User.class);
+    public ResponseEntity<User> editUserInfo( @Valid @RequestBody UserPayload editUserPayload) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+		User editUser = this.modelMapper.map(editUserPayload, User.class);
         User user = userService.loadUserDetails(userDetails.getUsername()).get();
 
         if (!(user == null)) {
             user.setName(editUser.getName());
             user.setEmail(editUser.getEmail());
-			user.setPassword(editUser.getPassword());
+			user.setPassword(encoder.encode(editUser.getPassword()));
 
             return new ResponseEntity<>(userService.editUser(user), HttpStatus.NO_CONTENT);
 
@@ -73,15 +80,27 @@ public class UserController {
     }
 
 //	 	@PreAuthorize("hasRole('ADMIN')")
-	@GetMapping("users")
-	public ResponseEntity<List<UserDTO>> getAllUsers() {
-		List<User> allUsers = userService.getAllUsers();
-		List<UserDTO> allUsersDtos = allUsers.stream().map((allUser -> 
-		this.modelMapper.map(allUser, UserDTO.class))).collect(Collectors.toList());
-		return new ResponseEntity<>(allUsersDtos, HttpStatus.OK);
+	@GetMapping("users/readers")
+	public ResponseEntity<List<UserDTO>> getReaders() {
+		
+		List<User> allReaders = userService.getAllReaders();
+		List<UserDTO> allReadersDtos = allReaders.stream().map((reader -> 
+		this.modelMapper.map(reader, UserDTO.class))).collect(Collectors.toList());
+		
+		return new ResponseEntity<>(allReadersDtos, HttpStatus.OK);
 	}
 	
 //	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping("users/publishers/{isApproved}")
+	public ResponseEntity<List<UserDTO>> getPublishers(@PathVariable boolean isApproved) {
+		
+		List<User> publishers = userService.getAllPublishers(isApproved);
+		List<UserDTO> publishersDTOs = publishers.stream().map((publisher -> 
+		this.modelMapper.map(publisher, UserDTO.class))).collect(Collectors.toList());
+		
+		return new ResponseEntity<>(publishersDTOs, HttpStatus.OK);
+	}
+	//	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("users/{user_id}")
 	public ResponseEntity<UserDTO> getUser(@PathVariable String user_id) {
 		User aUser = userService.getAUser(user_id);
