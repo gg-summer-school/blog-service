@@ -7,6 +7,7 @@ import net.gogroups.blogservices.model.ERole;
 import net.gogroups.blogservices.model.Role;
 import net.gogroups.blogservices.model.Transaction;
 import net.gogroups.blogservices.model.User;
+import net.gogroups.blogservices.model.UserDetailsDTO;
 import net.gogroups.blogservices.service.UserService;
 import net.gogroups.blogservices.util.SuccessResponse;
 import org.modelmapper.ModelMapper;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -54,7 +56,14 @@ public class UserController {
     public ResponseEntity<?> retrieveUserDetails() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return new ResponseEntity<>(userService.loadUserDetails(userDetails.getUsername()), HttpStatus.OK);
+		Optional<User> user = userService.loadUserDetails(userDetails.getUsername());
+		UserDetailsDTO userDetailsDTO = new UserDetailsDTO(user.get().getId(),
+										user.get().getName(),
+										user.get().getEmail(),
+										user.get().getArticles(),
+										user.get().getRole());
+
+		return new ResponseEntity<>(userDetailsDTO, HttpStatus.OK);
     }
 
 
