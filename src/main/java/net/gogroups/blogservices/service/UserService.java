@@ -12,7 +12,7 @@ import net.gogroups.blogservices.model.User;
 
 public interface UserService {
 
-     User saveUser(User user);
+     User editUser(User user);
 
      Optional<User> loadUserDetails(String email);
 	

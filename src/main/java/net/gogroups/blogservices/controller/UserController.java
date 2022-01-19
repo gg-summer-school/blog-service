@@ -65,14 +65,14 @@ public class UserController {
             user.setEmail(editUser.getEmail());
 			user.setPassword(editUser.getPassword());
 
-            return new ResponseEntity<>(userService.saveUser(user), HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(userService.editUser(user), HttpStatus.NO_CONTENT);
 
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-	 	@PreAuthorize("hasRole('ADMIN')")
+//	 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("users")
 	public ResponseEntity<List<UserDTO>> getAllUsers() {
 		List<User> allUsers = userService.getAllUsers();
@@ -81,7 +81,7 @@ public class UserController {
 		return new ResponseEntity<>(allUsersDtos, HttpStatus.OK);
 	}
 	
-	@PreAuthorize("hasRole('ADMIN')")
+//	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("users/{user_id}")
 	public ResponseEntity<UserDTO> getUser(@PathVariable String user_id) {
 		User aUser = userService.getAUser(user_id);
