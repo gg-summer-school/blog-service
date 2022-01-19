@@ -113,11 +113,10 @@ public class AuthController {
                 false);
 
         if(strRoles.equals("PUBLISHER")) {
-            Role userRole = roleRepository.findByRole(ERole.PUBLISHER);
-            roles.add(userRole);
+            roles.add(roleRepository.findByRole(ERole.READER));
+            roles.add(roleRepository.findByRole(ERole.PUBLISHER));
         } else {
-            Role userRole = roleRepository.findByRole(ERole.READER);
-            roles.add(userRole);
+            roles.add(roleRepository.findByRole(ERole.READER));
         }
 
         user.setRole(roles);
