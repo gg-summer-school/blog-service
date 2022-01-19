@@ -46,6 +46,7 @@ public class Article extends  BaseEntity{
             joinColumns = @JoinColumn(name = "article_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "contributor_id",
                     referencedColumnName = "id"))
+    @JsonIgnore
     private List<Contributor> contributors = new ArrayList<>();
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
