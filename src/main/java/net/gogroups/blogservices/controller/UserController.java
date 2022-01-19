@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -49,10 +50,12 @@ public class UserController {
 	@ApiOperation(value = "This method is used to get user details.", authorizations = {
             @Authorization(value = "jwtToken") })
     @GetMapping("/users/user_profile")
-    public ResponseEntity<?> retrieveUserDetails() {
+    public ResponseEntity<UserDTO> retrieveUserDetails() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return new ResponseEntity<>(userService.loadUserDetails(userDetails.getUsername()), HttpStatus.OK);
+		Optional<User> user = userService.loadUserDetails(userDetails.getUsername());
+		UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+		return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 
 
