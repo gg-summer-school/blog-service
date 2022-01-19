@@ -3,6 +3,8 @@ package net.gogroups.blogservices.controller;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
 import net.gogroups.blogservices.dto.*;
+import net.gogroups.blogservices.model.ERole;
+import net.gogroups.blogservices.model.Role;
 import net.gogroups.blogservices.model.Transaction;
 import net.gogroups.blogservices.model.User;
 import net.gogroups.blogservices.service.UserService;
@@ -56,7 +58,7 @@ public class UserController {
     }
 
 
-    @ApiOperation(value = "This method is used to get edit user details.", authorizations = {
+    @ApiOperation(value = "This method is used to edit user details.", authorizations = {
             @Authorization(value = "jwtToken") })
 //	@PreAuthorize("hasRole('ADMIN') or hasRole('READER') or hasRole('PUBLISHER')")
     @PutMapping("/users/user_profile")
@@ -148,7 +150,7 @@ public class UserController {
 		return new ResponseEntity<>(new SuccessResponse(message, new Date(), ""), HttpStatus.CREATED);
 	}
 	
-	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER') or hasRole('ADMIN')")
+	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER')")
 	@GetMapping("/transactions/user/{user_id}")
 	public ResponseEntity<List<TransactionDTO>> getAllTransactionsOfAUser(@PathVariable String user_id) {
 		List<Transaction> allTransactionsOfAUser = userService.getAllTransactionsOfAUser(user_id);
@@ -157,6 +159,15 @@ public class UserController {
 				.collect(Collectors.toList());
 		return new ResponseEntity<>(allTransactionDTOs, HttpStatus.OK);
 				
+	}
+	
+//	@PreAuthorize("hasRole('ADMIN')")
+	@PutMapping("addrole/users/{user_id}")
+	public ResponseEntity<SuccessResponse> addRole(@PathVariable String user_id,
+			  @RequestBody AddRolePayload addRolePayload) {
+		ERole userRole = modelMapper.map(addRolePayload.getRole(), ERole.class);
+		userService.addRole(user_id, userRole);		
+		return ResponseEntity.ok(new SuccessResponse("Role added successfully", new Date(), ""));
 	}
 	
 }

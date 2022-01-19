@@ -6,8 +6,7 @@ import java.util.Optional;
 import net.gogroups.blogservices.model.Transaction;
 import net.gogroups.blogservices.model.User;
 
-import net.gogroups.blogservices.model.Article;
-import net.gogroups.blogservices.model.Role;
+import net.gogroups.blogservices.model.ERole;
 
 public interface UserService {
 
@@ -27,7 +26,7 @@ public interface UserService {
 	
 	String reActivateUser(String user_id, User user);
 	
-//	String addRole(String user_id, List<Role> role);
+	void addRole(String user_id, ERole role);
 	
     Transaction payForArticle(String user_id, String article_id, Transaction transaction);
 	
