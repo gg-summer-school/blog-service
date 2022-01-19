@@ -5,6 +5,7 @@ import io.swagger.annotations.Authorization;
 import net.gogroups.blogservices.dto.*;
 import net.gogroups.blogservices.model.Transaction;
 import net.gogroups.blogservices.model.User;
+import net.gogroups.blogservices.model.UserDetailsDTO;
 import net.gogroups.blogservices.service.UserService;
 import net.gogroups.blogservices.util.SuccessResponse;
 import org.modelmapper.ModelMapper;
@@ -54,8 +55,13 @@ public class UserController {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 		Optional<User> user = userService.loadUserDetails(userDetails.getUsername());
-		UserDTO userDTO = this.modelMapper.map(user, UserDTO.class);
-		return new ResponseEntity<>(user, HttpStatus.OK);
+		UserDetailsDTO userDetailsDTO = new UserDetailsDTO(user.get().getId(),
+										user.get().getName(),
+										user.get().getEmail(),
+										user.get().getArticles(),
+										user.get().getRole());
+
+		return new ResponseEntity<>(userDetailsDTO, HttpStatus.OK);
     }
 
 
