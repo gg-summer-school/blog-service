@@ -20,6 +20,7 @@ public class AppConfig {
 	public static final String SORTDIRECTION = "asc";
 	public static final String PAGENUMBER = "0";
 	public static final String PAGESIZE = "10";
+	
 
 
 	public static  void setupFilesBaseDirectories(){

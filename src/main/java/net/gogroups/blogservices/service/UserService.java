@@ -7,8 +7,7 @@ import net.gogroups.blogservices.model.Transaction;
 import net.gogroups.blogservices.model.User;
 
 import net.gogroups.blogservices.model.Article;
-import net.gogroups.blogservices.model.Transaction;
-import net.gogroups.blogservices.model.User;
+import net.gogroups.blogservices.model.Role;
 
 public interface UserService {
 
@@ -27,6 +26,8 @@ public interface UserService {
 	String suspendUser(String user_id, User user);
 	
 	String reActivateUser(String user_id, User user);
+	
+//	String addRole(String user_id, List<Role> role);
 	
     Transaction payForArticle(String user_id, String article_id, Transaction transaction);
 	
