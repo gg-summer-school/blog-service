@@ -72,23 +72,35 @@ public class UserController {
             user.setEmail(editUser.getEmail());
 			user.setPassword(encoder.encode(editUser.getPassword()));
 
-            return new ResponseEntity<>(userService.saveUser(user), HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(userService.editUser(user), HttpStatus.NO_CONTENT);
 
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-	 	@PreAuthorize("hasRole('ADMIN')")
-	@GetMapping("users")
-	public ResponseEntity<List<UserDTO>> getAllUsers() {
-		List<User> allUsers = userService.getAllUsers();
-		List<UserDTO> allUsersDtos = allUsers.stream().map((allUser -> 
-		this.modelMapper.map(allUser, UserDTO.class))).collect(Collectors.toList());
-		return new ResponseEntity<>(allUsersDtos, HttpStatus.OK);
+//	 	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping("users/readers")
+	public ResponseEntity<List<UserDTO>> getReaders() {
+		
+		List<User> allReaders = userService.getAllReaders();
+		List<UserDTO> allReadersDtos = allReaders.stream().map((reader -> 
+		this.modelMapper.map(reader, UserDTO.class))).collect(Collectors.toList());
+		
+		return new ResponseEntity<>(allReadersDtos, HttpStatus.OK);
 	}
 	
-	@PreAuthorize("hasRole('ADMIN')")
+//	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping("users/publishers/{isApproved}")
+	public ResponseEntity<List<UserDTO>> getPublishers(@PathVariable boolean isApproved) {
+		
+		List<User> publishers = userService.getAllPublishers(isApproved);
+		List<UserDTO> publishersDTOs = publishers.stream().map((publisher -> 
+		this.modelMapper.map(publisher, UserDTO.class))).collect(Collectors.toList());
+		
+		return new ResponseEntity<>(publishersDTOs, HttpStatus.OK);
+	}
+	//	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("users/{user_id}")
 	public ResponseEntity<UserDTO> getUser(@PathVariable String user_id) {
 		User aUser = userService.getAUser(user_id);

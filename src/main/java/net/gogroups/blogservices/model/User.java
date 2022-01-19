@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+
 import javax.validation.constraints.Email;
+
 import java.util.List;
 
 @Getter
@@ -22,18 +24,19 @@ public class User {
     @Column(length = 50)
     private String id;
     private String name;
+    
     @Email
     private String email;
     private String password;
     private boolean active;
     private boolean isApproved;
 
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id",
                     referencedColumnName = "id"))
-    @JsonIgnore
     private List<Role> role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
