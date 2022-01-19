@@ -50,12 +50,12 @@ public class UserController {
 	@ApiOperation(value = "This method is used to get user details.", authorizations = {
             @Authorization(value = "jwtToken") })
     @GetMapping("/users/user_profile")
-    public ResponseEntity<UserDTO> retrieveUserDetails() {
+    public ResponseEntity<?> retrieveUserDetails() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 		Optional<User> user = userService.loadUserDetails(userDetails.getUsername());
-		UserDTO userDTO = modelMapper.map(user, UserDTO.class);
-		return new ResponseEntity<>(userDTO, HttpStatus.OK);
+		UserDTO userDTO = this.modelMapper.map(user, UserDTO.class);
+		return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
 
