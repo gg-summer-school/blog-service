@@ -64,10 +64,11 @@ public class ArticleController {
     //@PreAuthorize("hasRole('PUBLISHER')")
     public ResponseEntity<SuccessResponse> uploadFile(@PathVariable String articleId,
                                         @PathVariable String publisherId,
-                                        @RequestPart("coverPage") MultipartFile coverPage,
-                                        @RequestPart("document") MultipartFile document){
+                                        @RequestPart("files") List<MultipartFile> multipartFiles){
+        List<MultipartFile> files = this.articleUpload.getFileContentType(multipartFiles);
+        MultipartFile coverPage = files.get(0);
+        MultipartFile document = files.get(1);
         this.articleService.uploadArticleWithCoverPageImage(articleId, coverPage, document);
-
         return new ResponseEntity<>(new SuccessResponse("Files uploaded successfully", new Date(), ""), HttpStatus.OK);
     }
 
@@ -160,8 +161,8 @@ public class ArticleController {
     }
 
     @GetMapping("public/articles-search")
-    public ResponseEntity<List<ArticleDto>> searchArticles(@RequestParam("title") String title){
-        List<Article> articles = this.articleService.searchArticle(title);
+    public ResponseEntity<List<ArticleDto>> searchArticlesByTitle(@RequestParam("title") String title){
+        List<Article> articles = this.articleService.searchArticlesByTitle(title);
         List<ArticleDto> articleDtos = this.util.convertArticlesToArticleDtos(articles);
         return new ResponseEntity<>(articleDtos, HttpStatus.OK);
     }
@@ -188,5 +189,12 @@ public class ArticleController {
         List<Article> articles = this.articleService.getArticlesByCategory(categoryId);
         List<ArticleDto> articleDtoList =  this.util.convertArticlesToArticleDtos(articles);
         return new ResponseEntity<>(articleDtoList, HttpStatus.OK);
+    }
+
+    @GetMapping("public/articles-search-by-year")
+    public ResponseEntity<List<ArticleDto>> searchArticlesByYear(@RequestParam("year") int year){
+        List<Article> articles = this.articleService.searchArticlesByYear(year);
+        List<ArticleDto> articleDtos = this.util.convertArticlesToArticleDtos(articles);
+        return new ResponseEntity<>(articleDtos, HttpStatus.OK);
     }
 }
