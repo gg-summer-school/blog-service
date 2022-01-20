@@ -1,6 +1,7 @@
 package net.gogroups.blogservices.controller;
 
 import io.swagger.annotations.ApiOperation;
+import net.gogroups.blogservices.exception.CustomizedBadCredentialsException;
 import net.gogroups.blogservices.exception.TokenRefreshException;
 import net.gogroups.blogservices.model.ERole;
 import net.gogroups.blogservices.model.RefreshToken;
@@ -19,8 +20,10 @@ import net.gogroups.blogservices.security.service.UserDetailsImpl;
 import net.gogroups.blogservices.security.jwt.JwtUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -60,9 +63,13 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest)
             throws AccountNotFoundException {
-
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+    	 Authentication authentication;
+        try {
+        	  authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+        }catch(BadCredentialsException exception) {
+        	throw new CustomizedBadCredentialsException("Invalid user name or password");
+        }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -113,16 +120,16 @@ public class AuthController {
                 false);
 
         if(strRoles.equals("PUBLISHER")) {
-            roles.add(roleRepository.findByRole(ERole.READER));
-            roles.add(roleRepository.findByRole(ERole.PUBLISHER));
+            roles.add(roleRepository.findByRole(ERole.ROLE_READER));
+            roles.add(roleRepository.findByRole(ERole.ROLE_PUBLISHER));
         } else {
-            roles.add(roleRepository.findByRole(ERole.READER));
+            roles.add(roleRepository.findByRole(ERole.ROLE_READER));
         }
 
         user.setRole(roles);
 
         userRepository.save(user);
 
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+        return new ResponseEntity<>(new MessageResponse("User registered successfully!"), HttpStatus.CREATED);
     }
 }
