@@ -61,6 +61,8 @@ public class ArticleServiceImpl  implements ArticleService {
         User publisher = this.getUserByToken(userId);
         if(!isActive){
             throw new ForbiddenException("User account is suspended");
+        }else if(!publisher.isApproved()){
+            throw new ForbiddenException("User account is not approve");
         }
         Optional<Category>  category = categoryRepository.findById(categoryId);
         category.orElseThrow(() -> new ResourceNotFoundException("Category not found"));
@@ -130,9 +132,6 @@ public class ArticleServiceImpl  implements ArticleService {
     @Override
     public List<Article> getAllArticlesByPublisher(String userId) {
         User authUser =  this.getUserByToken(userId);
-        if(!authUser.isApproved()){
-           throw new ForbiddenException("Publisher account is not yet approve");
-        }
         List<Article> articles = articleRepository.findAll()
                 .stream().filter((article -> article.getUser().getId().equals(authUser.getId()))).
                         collect(Collectors.toList());
@@ -167,11 +166,14 @@ public class ArticleServiceImpl  implements ArticleService {
     }
 
     @Override
-    public void uploadArticleWithCoverPageImage(String articleId,  MultipartFile coverPage, MultipartFile document) {
+    public void uploadArticleWithCoverPageImage(String articleId,  String publisherId, MultipartFile coverPage, MultipartFile document) {
         String articleCover = "coverPage";
         String doc = "article";
         Optional<Article>  article = articleRepository.findById(articleId);
         article.orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+        if(!article.get().getUser().getId().equals(publisherId)){
+            throw new ForbiddenException("Publisher does not own article");
+        }
         Category category = article.get().getCategory();
         article.get().setCoverPage(StringUtils.cleanPath(coverPage.getOriginalFilename()));
         article.get().setDocument(StringUtils.cleanPath(document.getOriginalFilename()));
@@ -210,7 +212,7 @@ public class ArticleServiceImpl  implements ArticleService {
     }
 
     @Override
-    public List<Article> searchArticle(String title) {
+    public List<Article> searchArticlesByTitle(String title) {
         List<Article> articles = this.articleRepository.findByTitle(title);
         return articles;
     }
@@ -246,6 +248,13 @@ public class ArticleServiceImpl  implements ArticleService {
         List<Article> articles = this.articleRepository.findAll().stream().
                 filter(article -> article.getCategory().getId().equals(categoryId)).
                 collect(Collectors.toList());
+        return articles;
+    }
+
+    @Override
+    public List<Article> searchArticlesByYear(int year) {
+        List<Article> articles = this.articleRepository.findAll()
+                .stream().filter(article -> article.getCreatedAt().getYear() == year).collect(Collectors.toList());
         return articles;
     }
 

@@ -1,19 +1,21 @@
-package net.gogroups.blogservices.dto;
+package net.gogroups.blogservices.payload.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class UpdateArticlePayload {
+public class ArticlePayload {
 
     @NotNull
     @NotBlank
@@ -28,5 +30,11 @@ public class UpdateArticlePayload {
     private String toc;
 
     @NotNull
+    @DecimalMin(value = "1.0")
     private BigDecimal price;
+
+    private List<ContributorPayload> contributors;
+
+
+
 }

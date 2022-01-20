@@ -24,7 +24,9 @@ public class Article extends  BaseEntity{
     @Column(length = 50)
     private String id;
     private String title;
+    @Column(columnDefinition = "LONGTEXT")
     private String articleAbstract;
+    @Column(columnDefinition = "LONGTEXT")
     private String toc;
     private String coverPage;
     private String document;
@@ -46,6 +48,7 @@ public class Article extends  BaseEntity{
             joinColumns = @JoinColumn(name = "article_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "contributor_id",
                     referencedColumnName = "id"))
+    @JsonIgnore
     private List<Contributor> contributors = new ArrayList<>();
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
