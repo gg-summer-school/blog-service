@@ -26,9 +26,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
-
-
 import net.gogroups.blogservices.dto.TransactionDTO;
 import net.gogroups.blogservices.dto.UserDTO;
 
@@ -36,32 +33,28 @@ import net.gogroups.blogservices.dto.UserDTO;
 @RequestMapping("/api/protected/")
 @CrossOrigin()
 public class UserController {
-    
+
 	@Autowired
 	UserService userService;
 
 	@Autowired
 	PasswordEncoder encoder;
-    
-	 @Autowired
-	 private ModelMapper modelMapper;
+
+	@Autowired
+	private ModelMapper modelMapper;
 
 	@ApiOperation(value = "This method is used to get user details.", authorizations = {
-            @Authorization(value = "jwtToken") })
-    @GetMapping("/users/user_profile")
-    public ResponseEntity<?> retrieveUserDetails() {
+			@Authorization(value = "jwtToken") })
+	@GetMapping("/users/user_profile")
+	public ResponseEntity<?> retrieveUserDetails() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 		Optional<User> user = userService.loadUserDetails(userDetails.getUsername());
-		UserDetailsDTO userDetailsDTO = new UserDetailsDTO(user.get().getId(),
-										user.get().getName(),
-										user.get().getEmail(),
-										user.get().getArticles(),
-										user.get().getRole());
+		UserDetailsDTO userDetailsDTO = new UserDetailsDTO(user.get().getId(), user.get().getName(),
+				user.get().getEmail(), user.get().getArticles(), user.get().getRole());
 
 		return new ResponseEntity<>(userDetailsDTO, HttpStatus.OK);
-    }
-
+	}
 
     @ApiOperation(value = "This method is used to edit user details.", authorizations = {
             @Authorization(value = "jwtToken") })
@@ -72,107 +65,136 @@ public class UserController {
 		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
 		User editUser = this.modelMapper.map(editUserPayload, User.class);
-        User user = userService.loadUserDetails(userDetails.getUsername()).get();
+		User user = userService.loadUserDetails(userDetails.getUsername()).get();
 
-        if (!(user == null)) {
-            user.setName(editUser.getName());
-            user.setEmail(editUser.getEmail());
+		if (!(user == null)) {
+			user.setName(editUser.getName());
+			user.setEmail(editUser.getEmail());
 			user.setPassword(encoder.encode(editUser.getPassword()));
 
-            return new ResponseEntity<>(userService.editUser(user), HttpStatus.NO_CONTENT);
+			return new ResponseEntity<>(userService.editUser(user), HttpStatus.NO_CONTENT);
 
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
 
 	 //	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("users/readers")
 	public ResponseEntity<List<UserDTO>> getReaders() {
-		
+
 		List<User> allReaders = userService.getAllReaders();
-		List<UserDTO> allReadersDtos = allReaders.stream().map((reader -> 
-		this.modelMapper.map(reader, UserDTO.class))).collect(Collectors.toList());
-		
-		return new ResponseEntity<>(allReadersDtos, HttpStatus.OK);
+
+		List<UserDTO> listOfReadersDTOs = getListOfUserResourceDTOs(allReaders);
+
+		return new ResponseEntity<>(listOfReadersDTOs, HttpStatus.OK);
 	}
 	
 	//@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("users/publishers/{isApproved}")
 	public ResponseEntity<List<UserDTO>> getPublishers(@PathVariable boolean isApproved) {
-		
+
 		List<User> publishers = userService.getAllPublishers(isApproved);
-		List<UserDTO> publishersDTOs = publishers.stream().map((publisher -> 
-		this.modelMapper.map(publisher, UserDTO.class))).collect(Collectors.toList());
-		
-		return new ResponseEntity<>(publishersDTOs, HttpStatus.OK);
+		List<UserDTO> listOfPublishersDTOs = getListOfUserResourceDTOs(publishers);
+
+		return new ResponseEntity<>(listOfPublishersDTOs, HttpStatus.OK);
 	}
-	//	@PreAuthorize("hasRole('ADMIN')")
+
+	// @PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("users/{user_id}")
 	public ResponseEntity<UserDTO> getUser(@PathVariable String user_id) {
 		User aUser = userService.getAUser(user_id);
 		UserDTO userDto = modelMapper.map(aUser, UserDTO.class);
 		return new ResponseEntity<>(userDto, HttpStatus.OK);
 	}
-	
-	
-	//@PreAuthorize("hasRole('ADMIN')")
-	@PutMapping("approve/user/{user_id}")
-	public String approvePublisher(@PathVariable String user_id,  
+
+//	@PreAuthorize("hasRole('ADMIN')")
+	@PatchMapping("approve/user/{publisher_id}")
+	public ResponseEntity<SuccessResponse> approvePublisher(@PathVariable String publisher_id,
 			@Valid @RequestBody ApproveUserPayload approveUserPayload) {
 		User user = modelMapper.map(approveUserPayload, User.class);
-		String approvedPublisher = userService.approvePublisher(user_id, user);
-		return approvedPublisher;
+		userService.approvePublisher(publisher_id, user);
+		String message = "Publisher is approved";
+
+		return new ResponseEntity<>(new SuccessResponse(message, new Date(), ""), HttpStatus.OK);
 	}
-	
-	//@PreAuthorize("hasRole('ADMIN')")
-	@PutMapping("suspend/user/{user_id}")
-	public String suspendAUer(@PathVariable String user_id, 
+
+	@PreAuthorize("hasRole('ADMIN')")
+	@PatchMapping("suspend/user/{user_id}")
+	public ResponseEntity<SuccessResponse> suspendAUer(@PathVariable String user_id,
 			@Valid @RequestBody SuspendUserPayload suspendUserPayload) {
 		User user = modelMapper.map(suspendUserPayload, User.class);
-		String suspendedUser = userService.suspendUser(user_id, user);
-		return suspendedUser;
+		userService.suspendUser(user_id, user);
+		String message = "User is suspended";
+
+		return new ResponseEntity<>(new SuccessResponse(message, new Date(), ""), HttpStatus.OK);
 	}
-	
-	//@PreAuthorize("hasRole('ADMIN')")
-	@PutMapping("reactivate/user/{user_id}")
-	public String reactivateAUer(@PathVariable String user_id, 
+
+	@PreAuthorize("hasRole('ADMIN')")
+	@PatchMapping("reactivate/user/{user_id}")
+	public ResponseEntity<SuccessResponse> reactivateAUer(@PathVariable String user_id,
 			@Valid @RequestBody SuspendUserPayload suspendUserPayload) {
 		User user = modelMapper.map(suspendUserPayload, User.class);
-		String activatedUser = userService.reActivateUser(user_id, user);
-		return activatedUser;
+		userService.reActivateUser(user_id, user);
+
+		String message = "User is reactivated";
+		return new ResponseEntity<>(new SuccessResponse(message, new Date(), ""), HttpStatus.OK);
 	}
-	
-	//@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER') or hasRole('ADMIN')")
+
+	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER') or hasRole('ADMIN')")
 	@PostMapping("transactions/user/{user_id}/article/{article_id}")
-	public ResponseEntity<?> payForArticleByUser(@PathVariable String user_id, @PathVariable String article_id, 
+	public ResponseEntity<?> payForArticleByUser(@PathVariable String user_id, @PathVariable String article_id,
 			@Valid @RequestBody TransactionPayload transactionPayload) {
 		Transaction transaction = modelMapper.map(transactionPayload, Transaction.class);
 		Transaction payForArticle = userService.payForArticle(user_id, article_id, transaction);
-		
+
 		String message = payForArticle.getNameOfArticle() + " payed successfully " + "with Id " + payForArticle.getId();
-		
+
 		return new ResponseEntity<>(new SuccessResponse(message, new Date(), ""), HttpStatus.CREATED);
 	}
-	
-	//@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER')")
+
+	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER')")
 	@GetMapping("/transactions/user/{user_id}")
 	public ResponseEntity<List<TransactionDTO>> getAllTransactionsOfAUser(@PathVariable String user_id) {
 		List<Transaction> allTransactionsOfAUser = userService.getAllTransactionsOfAUser(user_id);
-		List<TransactionDTO> allTransactionDTOs = allTransactionsOfAUser.stream().map((
-				transaction -> this.modelMapper.map(transaction, TransactionDTO.class)))
+		List<TransactionDTO> allTransactionDTOs = allTransactionsOfAUser.stream()
+				.map((transaction -> this.modelMapper.map(transaction, TransactionDTO.class)))
 				.collect(Collectors.toList());
 		return new ResponseEntity<>(allTransactionDTOs, HttpStatus.OK);
-				
+
 	}
-	
-	//@PreAuthorize("hasRole('ADMIN')")
-	@PutMapping("addrole/users/{user_id}")
+
+//	@PreAuthorize("hasRole('ADMIN')")
+	@PatchMapping("addrole/users/{user_id}")
 	public ResponseEntity<SuccessResponse> addRole(@PathVariable String user_id,
-			  @RequestBody AddRolePayload addRolePayload) {
+			@RequestBody AddRolePayload addRolePayload) {
 		ERole userRole = modelMapper.map(addRolePayload.getRole(), ERole.class);
-		userService.addRole(user_id, userRole);		
-		return ResponseEntity.ok(new SuccessResponse("Role added successfully", new Date(), ""));
+		userService.addRole(user_id, userRole);
+		String message = "Role added successfully";
+		
+		return ResponseEntity.ok(new SuccessResponse(message, new Date(), ""));
 	}
-	
+
+//	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping("/users/{user_name})")
+	public ResponseEntity<List<UserDTO>> searchUser(@PathVariable String user_name) {
+		List<User> users = userService.searchUsers(user_name);
+		List<UserDTO> userDTOs = getListOfUserResourceDTOs(users);
+
+		return new ResponseEntity<>(userDTOs, HttpStatus.OK);
+	}
+
+	@DeleteMapping("user/{publisher_id}")
+	public ResponseEntity<SuccessResponse> declinePulisher(@PathVariable("publisher_id") String publisher_id) {
+		userService.declinePublisher(publisher_id);
+		String message = "Publisher is declined";
+		return new ResponseEntity<>(new SuccessResponse(message, new Date(), ""), HttpStatus.OK);
+	}
+
+	private List<UserDTO> getListOfUserResourceDTOs(List<User> users) {
+
+		List<UserDTO> userDTOs = users.stream().map((user -> this.modelMapper.map(user, UserDTO.class)))
+				.collect(Collectors.toList());
+		return userDTOs;
+	}
 }
