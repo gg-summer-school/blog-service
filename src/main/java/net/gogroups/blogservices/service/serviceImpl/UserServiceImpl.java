@@ -116,7 +116,7 @@ public class UserServiceImpl implements UserService {
 
 		Optional<User> userId = userRepository.findById(user_id);
 
-		System.out.println(userId.get().getRole());
+		 
 
 		checkingUserResource(user_id);
 
@@ -242,7 +242,7 @@ public class UserServiceImpl implements UserService {
 		 
 		userRepository.save(user.get());
 		
-		System.out.println(user);
+		 
 	}
 
 	private void checkingUserResource(String resource) {
