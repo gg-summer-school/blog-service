@@ -65,7 +65,7 @@ public class UserController {
 
     @ApiOperation(value = "This method is used to edit user details.", authorizations = {
             @Authorization(value = "jwtToken") })
-	@PreAuthorize("hasRole('ADMIN') or hasRole('READER') or hasRole('PUBLISHER')")
+	//@PreAuthorize("hasRole('ADMIN') or hasRole('READER') or hasRole('PUBLISHER')")
     @PutMapping("/users/user_profile")
     public ResponseEntity<User> editUserInfo( @Valid @RequestBody UserPayload editUserPayload) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -86,7 +86,7 @@ public class UserController {
         }
     }
 
-	 	@PreAuthorize("hasRole('ADMIN')")
+	 //	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("users/readers")
 	public ResponseEntity<List<UserDTO>> getReaders() {
 		
@@ -97,7 +97,7 @@ public class UserController {
 		return new ResponseEntity<>(allReadersDtos, HttpStatus.OK);
 	}
 	
-	@PreAuthorize("hasRole('ADMIN')")
+	//@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("users/publishers/{isApproved}")
 	public ResponseEntity<List<UserDTO>> getPublishers(@PathVariable boolean isApproved) {
 		
@@ -116,7 +116,7 @@ public class UserController {
 	}
 	
 	
-	@PreAuthorize("hasRole('ADMIN')")
+	//@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("approve/user/{user_id}")
 	public String approvePublisher(@PathVariable String user_id,  
 			@Valid @RequestBody ApproveUserPayload approveUserPayload) {
@@ -125,7 +125,7 @@ public class UserController {
 		return approvedPublisher;
 	}
 	
-	@PreAuthorize("hasRole('ADMIN')")
+	//@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("suspend/user/{user_id}")
 	public String suspendAUer(@PathVariable String user_id, 
 			@Valid @RequestBody SuspendUserPayload suspendUserPayload) {
@@ -134,7 +134,7 @@ public class UserController {
 		return suspendedUser;
 	}
 	
-	@PreAuthorize("hasRole('ADMIN')")
+	//@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("reactivate/user/{user_id}")
 	public String reactivateAUer(@PathVariable String user_id, 
 			@Valid @RequestBody SuspendUserPayload suspendUserPayload) {
@@ -143,7 +143,7 @@ public class UserController {
 		return activatedUser;
 	}
 	
-	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER') or hasRole('ADMIN')")
+	//@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER') or hasRole('ADMIN')")
 	@PostMapping("transactions/user/{user_id}/article/{article_id}")
 	public ResponseEntity<?> payForArticleByUser(@PathVariable String user_id, @PathVariable String article_id, 
 			@Valid @RequestBody TransactionPayload transactionPayload) {
@@ -155,7 +155,7 @@ public class UserController {
 		return new ResponseEntity<>(new SuccessResponse(message, new Date(), ""), HttpStatus.CREATED);
 	}
 	
-	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER')")
+	//@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER')")
 	@GetMapping("/transactions/user/{user_id}")
 	public ResponseEntity<List<TransactionDTO>> getAllTransactionsOfAUser(@PathVariable String user_id) {
 		List<Transaction> allTransactionsOfAUser = userService.getAllTransactionsOfAUser(user_id);
@@ -166,7 +166,7 @@ public class UserController {
 				
 	}
 	
-	@PreAuthorize("hasRole('ADMIN')")
+	//@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("addrole/users/{user_id}")
 	public ResponseEntity<SuccessResponse> addRole(@PathVariable String user_id,
 			  @RequestBody AddRolePayload addRolePayload) {

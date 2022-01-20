@@ -18,7 +18,7 @@ public interface ArticleService {
     public Article  getArticleByPublisher(String articleId, String categoryId, String userId);
     public Article getSingleArticle(String articleId);
     public User getUserByToken(String userId);
-    public void uploadArticleWithCoverPageImage(String categoryId, MultipartFile coverPage, MultipartFile document);
+    public void uploadArticleWithCoverPageImage(String categoryId, String publisherId, MultipartFile coverPage, MultipartFile document);
     public List<Article> getAllBoughtArticles(String userId);
     public Article getBoughtArticle(String userId, String articleId);
     public List<Article> searchArticlesByTitle(String title);
