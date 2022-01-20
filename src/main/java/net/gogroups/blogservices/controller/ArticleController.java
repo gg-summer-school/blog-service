@@ -1,10 +1,12 @@
 package net.gogroups.blogservices.controller;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 import net.gogroups.blogservices.config.AppConfig;
 import net.gogroups.blogservices.dto.ArticleDto;
-import net.gogroups.blogservices.dto.ArticlePayload;
+import net.gogroups.blogservices.payload.request.ArticlePayload;
 import net.gogroups.blogservices.dto.ArticleResponse;
-import net.gogroups.blogservices.dto.UpdateArticlePayload;
+import net.gogroups.blogservices.payload.request.UpdateArticlePayload;
 import net.gogroups.blogservices.model.Article;
 import net.gogroups.blogservices.repository.UserRepository;
 import net.gogroups.blogservices.service.serviceImpl.ArticleServiceImpl;
@@ -26,7 +28,6 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @CrossOrigin()
 @RestController
@@ -43,6 +44,8 @@ public class ArticleController {
     private Util util = new Util();
 
 
+    @ApiOperation(value = "", authorizations = {
+            @Authorization(value = "jwtToken") })
     @PostMapping("protected/publishers/{publisherId}/articles/categories/{categoryId}")
     //@PreAuthorize("hasRole('PUBLISHER')")
     public ResponseEntity<SuccessResponse> createArticle(@PathVariable("categoryId") String categoryId,
@@ -54,18 +57,23 @@ public class ArticleController {
     }
 
 
+    @ApiOperation(value = "", authorizations = {
+            @Authorization(value = "jwtToken") })
     @PutMapping(path = "protected/publishers/{publisherId}/articles/{articleId}/file-uploads",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     //@PreAuthorize("hasRole('PUBLISHER')")
     public ResponseEntity<SuccessResponse> uploadFile(@PathVariable String articleId,
                                         @PathVariable String publisherId,
-                                        @RequestPart("coverPage") MultipartFile coverPage,
-                                        @RequestPart("document") MultipartFile document){
+                                        @RequestPart("files") List<MultipartFile> multipartFiles){
+        List<MultipartFile> files = this.articleUpload.getFileContentType(multipartFiles);
+        MultipartFile coverPage = files.get(0);
+        MultipartFile document = files.get(1);
         this.articleService.uploadArticleWithCoverPageImage(articleId, coverPage, document);
-
         return new ResponseEntity<>(new SuccessResponse("Files uploaded successfully", new Date(), ""), HttpStatus.OK);
     }
 
+    @ApiOperation(value = "", authorizations = {
+            @Authorization(value = "jwtToken") })
     @PutMapping("protected/publishers/{publisherId}/articles/{articleId}/categories/{categoryId}")
     //@PreAuthorize("hasRole('PUBLISHER')")
     public ResponseEntity<ArticleDto> editArticle(@PathVariable  String articleId,
@@ -77,6 +85,8 @@ public class ArticleController {
         return new ResponseEntity<>(articleDto, HttpStatus.ACCEPTED);
     }
 
+    @ApiOperation(value = "", authorizations = {
+            @Authorization(value = "jwtToken") })
     @DeleteMapping("protected/publishers/{publisherId}/articles/{articleId}/categories/{categoryId}")
     //@PreAuthorize("hasRole('PUBLISHER')")
     public ResponseEntity<?> deleteArticle(@PathVariable String articleId,
@@ -98,6 +108,8 @@ public class ArticleController {
     }
 
     @GetMapping("protected/publishers/{publisherId}/articles")
+    @ApiOperation(value = "", authorizations = {
+            @Authorization(value = "jwtToken") })
     //@PreAuthorize("hasRole('PUBLISHER')")
     public ResponseEntity<List<ArticleDto>> getAllArticlesByPublisher(@PathVariable String publisherId){
         List<Article> articles = this.articleService.getAllArticlesByPublisher(publisherId);
@@ -105,6 +117,8 @@ public class ArticleController {
         return new ResponseEntity<>(articleDtos, HttpStatus.OK);
     }
 
+    @ApiOperation(value = "", authorizations = {
+            @Authorization(value = "jwtToken") })
     @GetMapping("protected/publisher/{publisherId}/articles/{articleId}/categories/{categoryId}")
     //@PreAuthorize("hasRole('PUBLISHER')")
     public ResponseEntity<ArticleDto> getArticleByPublisher(@PathVariable String articleId,
@@ -116,6 +130,8 @@ public class ArticleController {
     }
 
     @GetMapping("protected/articles")
+    @ApiOperation(value = "", authorizations = {
+            @Authorization(value = "jwtToken") })
     //@PreAuthorize("hasRole('PUBLISHER') or hasRole('READER') or hasRole('ADMIN')")
     public ResponseEntity<ArticleDto> getArticle(@RequestParam("articleId") String articleId){
         Article article = this.articleService.getSingleArticle(articleId);
@@ -124,6 +140,8 @@ public class ArticleController {
     }
 
     @GetMapping("protected/users/{userId}/paid-articles")
+    @ApiOperation(value = "", authorizations = {
+            @Authorization(value = "jwtToken") })
     //@PreAuthorize("hasRole('PUBLISHER') or hasRole('READER') or hasRole('ADMIN')")
     public ResponseEntity<List<ArticleDto>> getPaidArticlesByUser(@PathVariable("userId") String userId){
         List<Article> articles = this.articleService.getAllBoughtArticles(userId);
@@ -132,6 +150,8 @@ public class ArticleController {
     }
 
     @GetMapping("protected/users/{userId}/paid-articles/{articleId}")
+    @ApiOperation(value = "", authorizations = {
+            @Authorization(value = "jwtToken") })
     //@PreAuthorize("hasRole('PUBLISHER') or hasRole('READER') or hasRole('ADMIN')")
     public ResponseEntity<ArticleDto> getPaidArticleByUser(@PathVariable String userId,
                                                            @PathVariable String articleId){
@@ -141,13 +161,15 @@ public class ArticleController {
     }
 
     @GetMapping("public/articles-search")
-    public ResponseEntity<List<ArticleDto>> searchArticles(@RequestParam("title") String title){
-        List<Article> articles = this.articleService.searchArticle(title);
+    public ResponseEntity<List<ArticleDto>> searchArticlesByTitle(@RequestParam("title") String title){
+        List<Article> articles = this.articleService.searchArticlesByTitle(title);
         List<ArticleDto> articleDtos = this.util.convertArticlesToArticleDtos(articles);
         return new ResponseEntity<>(articleDtos, HttpStatus.OK);
     }
 
     @PostMapping("protected/articles")
+    @ApiOperation(value = "", authorizations = {
+            @Authorization(value = "jwtToken") })
     public ResponseEntity<Resource> downloadFile(@RequestParam("articleId") String articleId,
                                                  HttpServletRequest request) throws IOException {
         Resource resource = this.articleService.loadFileAsResource(articleId);
@@ -167,5 +189,12 @@ public class ArticleController {
         List<Article> articles = this.articleService.getArticlesByCategory(categoryId);
         List<ArticleDto> articleDtoList =  this.util.convertArticlesToArticleDtos(articles);
         return new ResponseEntity<>(articleDtoList, HttpStatus.OK);
+    }
+
+    @GetMapping("public/articles-search-by-year")
+    public ResponseEntity<List<ArticleDto>> searchArticlesByYear(@RequestParam("year") int year){
+        List<Article> articles = this.articleService.searchArticlesByYear(year);
+        List<ArticleDto> articleDtos = this.util.convertArticlesToArticleDtos(articles);
+        return new ResponseEntity<>(articleDtos, HttpStatus.OK);
     }
 }

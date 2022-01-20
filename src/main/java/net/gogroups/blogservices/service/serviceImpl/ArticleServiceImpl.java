@@ -210,7 +210,7 @@ public class ArticleServiceImpl  implements ArticleService {
     }
 
     @Override
-    public List<Article> searchArticle(String title) {
+    public List<Article> searchArticlesByTitle(String title) {
         List<Article> articles = this.articleRepository.findByTitle(title);
         return articles;
     }
@@ -246,6 +246,13 @@ public class ArticleServiceImpl  implements ArticleService {
         List<Article> articles = this.articleRepository.findAll().stream().
                 filter(article -> article.getCategory().getId().equals(categoryId)).
                 collect(Collectors.toList());
+        return articles;
+    }
+
+    @Override
+    public List<Article> searchArticlesByYear(int year) {
+        List<Article> articles = this.articleRepository.findAll()
+                .stream().filter(article -> article.getCreatedAt().getYear() == year).collect(Collectors.toList());
         return articles;
     }
 

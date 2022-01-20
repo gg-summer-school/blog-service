@@ -53,4 +53,10 @@ public class ControllerExceptionAdvice  extends ResponseEntityExceptionHandler {
         ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage(), webRequest.getDescription(false), new Date());
         return new ResponseEntity<>(exceptionResponse, HttpStatus.UNAUTHORIZED);
     }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<Object> handleBadRequestException(Exception exception, WebRequest webRequest){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage(), webRequest.getDescription(false), new Date());
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+    }
 }

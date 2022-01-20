@@ -24,7 +24,7 @@ public class Role {
     @Enumerated(EnumType.STRING)
     private ERole role;
 
-    @JsonIgnore
+
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "role")
     private List<User> user;
 
