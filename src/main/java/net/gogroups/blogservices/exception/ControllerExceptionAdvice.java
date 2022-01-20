@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -35,6 +37,12 @@ public class ControllerExceptionAdvice  extends ResponseEntityExceptionHandler {
         ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage(), webRequest.getDescription(false), new Date());
         return new ResponseEntity<>(exceptionResponse, HttpStatus.FORBIDDEN);
     }
+
+//    @ExceptionHandler(ForbiddenException.class)
+//    public ResponseEntity<?> handlerAccessDeniedException(final Exception exception, final HttpServletRequest request, final HttpServletResponse response) {
+//        ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage(), "Access denied", new Date());
+//        return new ResponseEntity<>(exceptionResponse, HttpStatus.FORBIDDEN);
+//    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> handleNotFoundException(Exception exception, WebRequest webRequest){
