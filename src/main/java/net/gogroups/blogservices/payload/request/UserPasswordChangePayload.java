@@ -9,10 +9,11 @@ import javax.validation.constraints.NotNull;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserPayload {
+public class UserPasswordChangePayload {
 
     @NotNull
-    private String name;
+    private String oldPassword;
+
     @NotNull
-    private String email;
+    private String newPassword;
 }
