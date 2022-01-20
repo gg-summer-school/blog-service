@@ -3,6 +3,7 @@ package net.gogroups.blogservices.exception;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -37,12 +38,18 @@ public class ControllerExceptionAdvice  extends ResponseEntityExceptionHandler {
         ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage(), webRequest.getDescription(false), new Date());
         return new ResponseEntity<>(exceptionResponse, HttpStatus.FORBIDDEN);
     }
+    
+    @ExceptionHandler(CustomizedBadCredentialsException.class)
+    public ResponseEntity<?> handleBadCredentialsException(Exception exception, WebRequest webRequest){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage(), webRequest.getDescription(false), new Date());
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+    }
 
-//    @ExceptionHandler(ForbiddenException.class)
-//    public ResponseEntity<?> handlerAccessDeniedException(final Exception exception, final HttpServletRequest request, final HttpServletResponse response) {
-//        ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage(), "Access denied", new Date());
-//        return new ResponseEntity<>(exceptionResponse, HttpStatus.FORBIDDEN);
-//    }
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> accessDeniedException(AccessDeniedException exception) throws AccessDeniedException {
+    	ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage(), "", new Date());
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.FORBIDDEN);
+    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> handleNotFoundException(Exception exception, WebRequest webRequest){

@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
 		List<User> findAllReaders = userRepository.findAll();
 		for (User user : findAllReaders) {
 			for (Role role : user.getRole()) {
-				if (role.getRole().equals(ERole.READER)) {
+				if (role.getRole().equals(ERole.ROLE_READER)) {
 					readers.add(user);
 				}
 			}
@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
 		List<User> findAllPublishers = userRepository.findAll();
 		for (User user : findAllPublishers) {
 			for (Role role : user.getRole()) {
-				if (role.getRole().equals(ERole.PUBLISHER)) {
+				if (role.getRole().equals(ERole.ROLE_PUBLISHER)) {
 					publishers.add(user);
 				}
 			}
@@ -238,7 +238,7 @@ public class UserServiceImpl implements UserService {
 		checkingUserResource(user_id);
 		
 		 user.get().getRole()
-			.removeIf(role -> role.getRole().equals(ERole.PUBLISHER));
+			.removeIf(role -> role.getRole().equals(ERole.ROLE_PUBLISHER));
 		 
 		userRepository.save(user.get());
 		

@@ -1,9 +1,11 @@
-package net.gogroups.blogservices.model;
+package net.gogroups.blogservices.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.gogroups.blogservices.model.Article;
+import net.gogroups.blogservices.model.Role;
 
 import java.util.List;
 

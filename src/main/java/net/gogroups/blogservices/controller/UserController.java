@@ -5,7 +5,6 @@ import io.swagger.annotations.Authorization;
 import net.gogroups.blogservices.model.ERole;
 import net.gogroups.blogservices.model.Transaction;
 import net.gogroups.blogservices.model.User;
-import net.gogroups.blogservices.model.UserDetailsDTO;
 import net.gogroups.blogservices.payload.request.*;
 import net.gogroups.blogservices.service.UserService;
 import net.gogroups.blogservices.util.SuccessResponse;
@@ -28,6 +27,7 @@ import java.util.stream.Collectors;
 
 import net.gogroups.blogservices.dto.TransactionDTO;
 import net.gogroups.blogservices.dto.UserDTO;
+import net.gogroups.blogservices.dto.UserDetailsDTO;
 
 @RestController
 @RequestMapping("/api/protected/")
@@ -58,7 +58,7 @@ public class UserController {
 
     @ApiOperation(value = "This method is used to edit user details.", authorizations = {
             @Authorization(value = "jwtToken") })
-	//@PreAuthorize("hasRole('ADMIN') or hasRole('READER') or hasRole('PUBLISHER')")
+	@PreAuthorize("hasRole('ADMIN') or hasRole('READER') or hasRole('PUBLISHER')")
     @PutMapping("/users/user_profile")
     public ResponseEntity<User> editUserInfo( @Valid @RequestBody UserPayload editUserPayload) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -79,7 +79,7 @@ public class UserController {
 		}
 	}
 
-	 //	@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("users/readers")
 	public ResponseEntity<List<UserDTO>> getReaders() {
 
@@ -90,7 +90,7 @@ public class UserController {
 		return new ResponseEntity<>(listOfReadersDTOs, HttpStatus.OK);
 	}
 	
-	//@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("users/publishers/{isApproved}")
 	public ResponseEntity<List<UserDTO>> getPublishers(@PathVariable boolean isApproved) {
 
@@ -100,7 +100,7 @@ public class UserController {
 		return new ResponseEntity<>(listOfPublishersDTOs, HttpStatus.OK);
 	}
 
-	// @PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("users/{user_id}")
 	public ResponseEntity<UserDTO> getUser(@PathVariable String user_id) {
 		User aUser = userService.getAUser(user_id);
@@ -108,7 +108,7 @@ public class UserController {
 		return new ResponseEntity<>(userDto, HttpStatus.OK);
 	}
 
-//	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("approve/user/{publisher_id}")
 	public ResponseEntity<SuccessResponse> approvePublisher(@PathVariable String publisher_id,
 			@Valid @RequestBody ApproveUserPayload approveUserPayload) {
@@ -164,7 +164,7 @@ public class UserController {
 
 	}
 
-//	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("addrole/users/{user_id}")
 	public ResponseEntity<SuccessResponse> addRole(@PathVariable String user_id,
 			@RequestBody AddRolePayload addRolePayload) {
@@ -175,7 +175,7 @@ public class UserController {
 		return ResponseEntity.ok(new SuccessResponse(message, new Date(), ""));
 	}
 
-//	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/users/{user_name})")
 	public ResponseEntity<List<UserDTO>> searchUser(@PathVariable String user_name) {
 		List<User> users = userService.searchUsers(user_name);
@@ -184,6 +184,7 @@ public class UserController {
 		return new ResponseEntity<>(userDTOs, HttpStatus.OK);
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("user/{publisher_id}")
 	public ResponseEntity<SuccessResponse> declinePulisher(@PathVariable("publisher_id") String publisher_id) {
 		userService.declinePublisher(publisher_id);
