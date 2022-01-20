@@ -7,6 +7,7 @@ import net.gogroups.blogservices.model.Transaction;
 import net.gogroups.blogservices.model.User;
 import net.gogroups.blogservices.model.UserDetailsDTO;
 import net.gogroups.blogservices.payload.request.*;
+import net.gogroups.blogservices.payload.response.MessageResponse;
 import net.gogroups.blogservices.service.UserService;
 import net.gogroups.blogservices.util.SuccessResponse;
 import org.modelmapper.ModelMapper;
@@ -77,16 +78,40 @@ public class UserController {
         if (!(user == null)) {
             user.setName(editUser.getName());
             user.setEmail(editUser.getEmail());
-			user.setPassword(encoder.encode(editUser.getPassword()));
 
-            return new ResponseEntity<>(userService.editUser(user), HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(userService.editUser(user), HttpStatus.CREATED);
 
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-	 //	@PreAuthorize("hasRole('ADMIN')")
+	@ApiOperation(value = "This method is used to edit user password", authorizations = {
+			@Authorization(value = "jwtToken") })
+//	@PreAuthorize("hasRole('ADMIN') or hasRole('READER') or hasRole('PUBLISHER')")
+	@PatchMapping("/users/user_profile/change_password")
+	public ResponseEntity<MessageResponse> changePassword( @Valid @RequestBody UserPasswordChangePayload oldUserPasswordPayload) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+		User user = userService.loadUserDetails(userDetails.getUsername()).get();
+		User editUserPassword = this.modelMapper.map(user, User.class);
+//		editUserPassword.setPassword(oldUserPasswordPayload.getNewPassword());
+
+
+		if (user == null)
+			return new ResponseEntity<>(new MessageResponse("User does not exist"), HttpStatus.NOT_FOUND);
+
+		else if(!(encoder.matches(oldUserPasswordPayload.getOldPassword(),editUserPassword.getPassword())))
+			return new ResponseEntity<>(new MessageResponse("Passwords donot match"),HttpStatus.BAD_REQUEST);
+		else{
+			editUserPassword.setPassword(encoder.encode(oldUserPasswordPayload.getNewPassword()));
+			userService.editUser(user);
+			return new ResponseEntity<>(new MessageResponse("Password Updated"),HttpStatus.CREATED);
+		}
+	}
+
+	 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("users/readers")
 	public ResponseEntity<List<UserDTO>> getReaders() {
 		
