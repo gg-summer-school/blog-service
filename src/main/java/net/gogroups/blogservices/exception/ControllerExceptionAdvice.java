@@ -49,6 +49,16 @@ public class ControllerExceptionAdvice  extends ResponseEntityExceptionHandler {
         ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage(), webRequest.getDescription(false), new Date());
         return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
     }
+    
+    @ExceptionHandler(ResourceAlreadyExistException.class)
+	public ResponseEntity<ExceptionResponse> handleResourceAlreadyExistExceptions(ResourceAlreadyExistException ex, WebRequest webRequest) {
+		ExceptionResponse exceptionResponse = new ExceptionResponse();
+		exceptionResponse.setDetails("RESOURCE_ALREADY_EXIST");
+		exceptionResponse.setMessage(ex.getMessage());
+		exceptionResponse.setTimeStamp(new Date());
+		
+		return new ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.CONFLICT);
+	}
 
     @ExceptionHandler(CustomIOException.class)
     public ResponseEntity<Object> handleIOException(Exception exception, WebRequest webRequest){
