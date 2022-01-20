@@ -20,16 +20,20 @@ public interface UserService {
 	
 	User getAUser(String user_id);
 	
-	String approvePublisher(String user_id, User user);
+	void approvePublisher(String user_id, User user);
 	
-	String suspendUser(String user_id, User user);
+	void suspendUser(String user_id, User user);
 	
-	String reActivateUser(String user_id, User user);
+	void reActivateUser(String user_id, User user);
 	
 	void addRole(String user_id, ERole role);
 	
     Transaction payForArticle(String user_id, String article_id, Transaction transaction);
 	
 	List<Transaction> getAllTransactionsOfAUser(String user_id);
+	
+	List<User> searchUsers(String name);
+	
+	void declinePublisher(String user_id);
 	
 }
