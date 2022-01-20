@@ -1,4 +1,4 @@
-package net.gogroups.blogservices.dto;
+package net.gogroups.blogservices.payload.request;
 
 
 import lombok.AllArgsConstructor;

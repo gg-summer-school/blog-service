@@ -1,4 +1,4 @@
-package net.gogroups.blogservices.dto;
+package net.gogroups.blogservices.payload.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,9 +13,9 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Getter
 @Setter
-public class SuspendUserPayload {
+public class ApproveUserPayload {
 
     @NotNull
-    private boolean active;
+    private boolean isApproved;
 
 }

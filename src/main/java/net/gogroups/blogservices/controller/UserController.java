@@ -2,12 +2,11 @@ package net.gogroups.blogservices.controller;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
-import net.gogroups.blogservices.dto.*;
 import net.gogroups.blogservices.model.ERole;
-import net.gogroups.blogservices.model.Role;
 import net.gogroups.blogservices.model.Transaction;
 import net.gogroups.blogservices.model.User;
 import net.gogroups.blogservices.model.UserDetailsDTO;
+import net.gogroups.blogservices.payload.request.*;
 import net.gogroups.blogservices.service.UserService;
 import net.gogroups.blogservices.util.SuccessResponse;
 import org.modelmapper.ModelMapper;
@@ -31,10 +30,7 @@ import java.util.stream.Collectors;
 
 
 import net.gogroups.blogservices.dto.TransactionDTO;
-import net.gogroups.blogservices.dto.TransactionPayload;
 import net.gogroups.blogservices.dto.UserDTO;
-import net.gogroups.blogservices.dto.ApproveUserPayload;
-import net.gogroups.blogservices.dto.SuspendUserPayload;
 
 @RestController
 @RequestMapping("/api/protected/")
