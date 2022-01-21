@@ -56,6 +56,13 @@ public class Article extends  BaseEntity{
     private List<Transaction> transaction;
 
 
+    @Transient
+    public String getArticleImagePath() {
+        if (coverPage == null || id == null) return null;
+        return "/uploads/coverPages/HEALTH/" + coverPage;
+    }
+
+
 
 
 }

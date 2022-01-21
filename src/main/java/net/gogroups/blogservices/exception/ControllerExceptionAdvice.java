@@ -47,7 +47,7 @@ public class ControllerExceptionAdvice  extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> accessDeniedException(AccessDeniedException exception) throws AccessDeniedException {
-    	ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage(), "", new Date());
+    	ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getMessage(), "The user does not have the role to access this endpoint", new Date());
         return new ResponseEntity<>(exceptionResponse, HttpStatus.FORBIDDEN);
     }
 
