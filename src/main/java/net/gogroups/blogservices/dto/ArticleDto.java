@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.gogroups.blogservices.model.Category;
 import net.gogroups.blogservices.model.Contributor;
 
 import java.math.BigDecimal;
