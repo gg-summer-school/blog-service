@@ -130,9 +130,9 @@ public class ArticleController {
     }
 
     @GetMapping("protected/articles")
-//    @ApiOperation(value = "", authorizations = {
-//            @Authorization(value = "jwtToken") })
-//    @PreAuthorize("hasRole('PUBLISHER') or hasRole('READER') or hasRole('ADMIN')")
+    @ApiOperation(value = "", authorizations = {
+            @Authorization(value = "jwtToken") })
+    @PreAuthorize("hasRole('PUBLISHER') or hasRole('READER') or hasRole('ADMIN')")
     public ResponseEntity<ArticleDto> getArticle(@RequestParam("articleId") String articleId){
         Article article = this.articleService.getSingleArticle(articleId);
         ArticleDto articleDto = this.articleDto.convertArticleToArticleDto(article);
