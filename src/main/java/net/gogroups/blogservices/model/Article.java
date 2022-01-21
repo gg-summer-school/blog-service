@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.gogroups.blogservices.repository.ArticleRepository;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -58,8 +59,9 @@ public class Article extends  BaseEntity{
 
     @Transient
     public String getArticleImagePath() {
+
         if (coverPage == null || id == null) return null;
-        return "/uploads/coverPages/HEALTH/" + coverPage;
+        return "/uploads/coverPages/"+category.getName()+"/" + coverPage;
     }
 
 
