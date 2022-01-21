@@ -34,13 +34,13 @@ public class Util {
     }
 
    
-   public User checkingUserResource(String resource) {
-		Optional<User> user = userRepository.findById(resource);
-		if (!user.isPresent()) {
-			throw new ResourceNotFoundException("User not found with id- " + resource);
-		}
-		return user.get();
-	}
+//   public User checkingUserResource(String resource) {
+//		Optional<User> user = userRepository.findById(resource);
+//		if (!user.isPresent()) {
+//			throw new ResourceNotFoundException("User not found with id- " + resource);
+//		}
+//		return user.get();
+//	}
 
 
 

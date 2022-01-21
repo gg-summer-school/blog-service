@@ -104,7 +104,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void approvePublisher(String user_id, User user) {
 		 
-		User user1 = this.util.checkingUserResource(user_id);
+		User user1 = checkingUserResource(user_id);
 
 		if (user1.isApproved()) {
 			throw new  ResourceAlreadyExistException("Publisher is already approved");
@@ -118,12 +118,13 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public void suspendUser(String user_id, User user) {
-		User user1 = this.util.checkingUserResource(user_id);
+		User user1 = checkingUserResource(user_id);
+		System.out.println("USer: "+user1);
 
-		if (user.isActive()) {
-			user.setActive(user.isActive());
-			user.setId(user.getId());
-			userRepository.save(user);
+		if (user1.isActive()) {
+			user1.setActive(user.isActive());
+			user1.setId(user.getId());
+			userRepository.save(user1);
 
 		} else {
 			throw new ResourceAlreadyExistException("User is already suspended");
@@ -133,7 +134,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void reActivateUser(String user_id, User user) {
-		User user1 = this.util.checkingUserResource(user_id);
+		User user1 = checkingUserResource(user_id);
 
 		if (user1.isActive()) {
 			throw new ResourceAlreadyExistException("User is already active");
@@ -149,7 +150,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Transaction payForArticle(String user_id, String article_id, Transaction transaction) {
-		User user = this.util.checkingUserResource(user_id);
+		User user = checkingUserResource(user_id);
 
 		Optional<Article> article = articleRepository.findById(article_id);
 
@@ -170,7 +171,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List<Transaction> getAllTransactionsOfAUser(String user_id) {
 
-		User user = this.util.checkingUserResource(user_id);
+		User user = checkingUserResource(user_id);
 
 		List<Transaction> allTransactionsOfAUser = user.getTransactions();
 		if (allTransactionsOfAUser.isEmpty()) {
@@ -181,7 +182,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void addRole(String user_id, ERole role) {
-		User user = this.util.checkingUserResource(user_id);
+		User user = checkingUserResource(user_id);
 
 		Role newRole = roleRepository.findByRole(role);
 		for( Role userRole : user.getRole()) {
@@ -208,7 +209,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void declinePublisher(String user_id) {
-		User user = this.util.checkingUserResource(user_id);
+		User user = checkingUserResource(user_id);
 		
 		 user.getRole()
 			.removeIf(role -> role.getRole().equals(ERole.ROLE_PUBLISHER));
@@ -217,5 +218,12 @@ public class UserServiceImpl implements UserService {
 		
 		 
 	}
+	
+	public User checkingUserResource(String resource) {
+		Optional<User> user = userRepository.findById(resource);
+		user.orElseThrow(()-> new ResourceNotFoundException("User not found with id- " + resource));
+		return user.get();
+	}
+
 
 }

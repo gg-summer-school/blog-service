@@ -135,9 +135,9 @@ public class UserController {
 		return new ResponseEntity<>(new SuccessResponse(message, new Date(), ""), HttpStatus.OK);
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
+//	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("suspend/user/{user_id}")
-	public ResponseEntity<SuccessResponse> suspendAUer(@PathVariable String user_id,
+	public ResponseEntity<SuccessResponse> suspendUser(@PathVariable String user_id,
 			@Valid @RequestBody SuspendUserPayload suspendUserPayload) {
 		User user = modelMapper.map(suspendUserPayload, User.class);
 		userService.suspendUser(user_id, user);
@@ -148,7 +148,7 @@ public class UserController {
 
 	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("reactivate/user/{user_id}")
-	public ResponseEntity<SuccessResponse> reactivateAUer(@PathVariable String user_id,
+	public ResponseEntity<SuccessResponse> reactivateUser(@PathVariable String user_id,
 			@Valid @RequestBody SuspendUserPayload suspendUserPayload) {
 		User user = modelMapper.map(suspendUserPayload, User.class);
 		userService.reActivateUser(user_id, user);
@@ -180,7 +180,7 @@ public class UserController {
 
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
+//	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("addrole/users/{user_id}")
 	public ResponseEntity<SuccessResponse> addRole(@PathVariable String user_id,
 			@RequestBody AddRolePayload addRolePayload) {
