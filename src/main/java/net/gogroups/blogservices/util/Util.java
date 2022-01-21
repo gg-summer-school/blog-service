@@ -26,12 +26,13 @@ public class Util {
         UUID uuid = UUID.randomUUID();
         return uuid.toString();
     }
+    
+    public List<ArticleDto> convertArticlesToArticleDtos(List<Article>  articles){
+        List<ArticleDto> articleDtos = articles.
+                stream().map(article -> this.modelMapper.map(article,ArticleDto.class)).collect(Collectors.toList());
+        return articleDtos;
+    }
 
-   public List<ArticleDto> convertArticlesToArticleDtos(List<Article>  articles){
-       List<ArticleDto> articleDtos = articles.
-               stream().map(article -> this.modelMapper.map(article,ArticleDto.class)).collect(Collectors.toList());
-       return articleDtos;
-   }
    
    public User checkingUserResource(String resource) {
 		Optional<User> user = userRepository.findById(resource);

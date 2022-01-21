@@ -41,8 +41,8 @@ public class ArticleController {
     private ModelMapper modelMapper;
     @Autowired
     UserRepository userRepository;
-    private ArticleUpload articleUpload = new ArticleUpload();
-    private Util util = new Util();
+    private final ArticleUpload articleUpload = new ArticleUpload();
+    private final ArticleDto articleDto = new ArticleDto();
 
 
     @ApiOperation(value = "", authorizations = {
@@ -82,7 +82,7 @@ public class ArticleController {
                                                   @RequestBody UpdateArticlePayload updateArticlePayload){
         Article article = modelMapper.map(updateArticlePayload, Article.class);
         Article updatedArticle = this.articleService.editArticle(articleId, categoryId, publisherId, article);
-        ArticleDto articleDto = this.modelMapper.map(updatedArticle, ArticleDto.class);
+        ArticleDto articleDto = this.articleDto.convertArticleToArticleDto(updatedArticle);
         return new ResponseEntity<>(articleDto, HttpStatus.ACCEPTED);
     }
 
@@ -97,7 +97,6 @@ public class ArticleController {
     }
 
     @GetMapping("public/articles")
-    @PreAuthorize("hasRole('PUBLISHER') or hasRole('ADMIN') or hasRole('READER')")
     public ResponseEntity<ArticleResponse> getAllArticles(
             @RequestParam(value = "pageNo", defaultValue = AppConfig.PAGENUMBER, required = false) int pageNo,
             @RequestParam(value = "pageSize", defaultValue = AppConfig.PAGESIZE, required = false) int pageSize,
@@ -114,7 +113,7 @@ public class ArticleController {
     @PreAuthorize("hasRole('PUBLISHER')")
     public ResponseEntity<List<ArticleDto>> getAllArticlesByPublisher(@PathVariable String publisherId){
         List<Article> articles = this.articleService.getAllArticlesByPublisher(publisherId);
-        List<ArticleDto> articleDtos = this.util.convertArticlesToArticleDtos(articles);
+        List<ArticleDto> articleDtos = this.articleDto.convertArticlesToArticleDtos(articles);
         return new ResponseEntity<>(articleDtos, HttpStatus.OK);
     }
 
@@ -126,7 +125,7 @@ public class ArticleController {
                                                             @PathVariable String categoryId,
                                                             @PathVariable String publisherId ) {
         Article article = this.articleService.getArticleByPublisher(articleId,categoryId, publisherId);
-        ArticleDto articleDto = this.modelMapper.map(article, ArticleDto.class);
+        ArticleDto articleDto = this.articleDto.convertArticleToArticleDto(article);
         return new ResponseEntity<>(articleDto,HttpStatus.OK);
     }
 
@@ -136,7 +135,7 @@ public class ArticleController {
     @PreAuthorize("hasRole('PUBLISHER') or hasRole('READER') or hasRole('ADMIN')")
     public ResponseEntity<ArticleDto> getArticle(@RequestParam("articleId") String articleId){
         Article article = this.articleService.getSingleArticle(articleId);
-        ArticleDto articleDto = this.modelMapper.map(article, ArticleDto.class);
+        ArticleDto articleDto = this.articleDto.convertArticleToArticleDto(article);
         return new ResponseEntity<>(articleDto,HttpStatus.OK);
     }
 
@@ -146,7 +145,7 @@ public class ArticleController {
     @PreAuthorize("hasRole('PUBLISHER') or hasRole('READER') or hasRole('ADMIN')")
     public ResponseEntity<List<ArticleDto>> getPaidArticlesByUser(@PathVariable("userId") String userId){
         List<Article> articles = this.articleService.getAllBoughtArticles(userId);
-        List<ArticleDto> articleDtos = this.util.convertArticlesToArticleDtos(articles);
+        List<ArticleDto> articleDtos = this.articleDto.convertArticlesToArticleDtos(articles);
         return new ResponseEntity<>(articleDtos, HttpStatus.OK);
     }
 
@@ -157,14 +156,14 @@ public class ArticleController {
     public ResponseEntity<ArticleDto> getPaidArticleByUser(@PathVariable String userId,
                                                            @PathVariable String articleId){
         Article article = this.articleService.getBoughtArticle(userId, articleId);
-        ArticleDto articleDto = this.modelMapper.map(article, ArticleDto.class);
+        ArticleDto articleDto = this.articleDto.convertArticleToArticleDto(article);
         return new ResponseEntity<>(articleDto, HttpStatus.OK);
     }
 
     @GetMapping("public/articles-search")
     public ResponseEntity<List<ArticleDto>> searchArticlesByTitle(@RequestParam("title") String title){
         List<Article> articles = this.articleService.searchArticlesByTitle(title);
-        List<ArticleDto> articleDtos = this.util.convertArticlesToArticleDtos(articles);
+        List<ArticleDto> articleDtos = this.articleDto.convertArticlesToArticleDtos(articles);
         return new ResponseEntity<>(articleDtos, HttpStatus.OK);
     }
 
@@ -188,14 +187,14 @@ public class ArticleController {
     @GetMapping("public/articles/categories")
     public ResponseEntity<List<ArticleDto>> getArticlesByCategories(@RequestParam("categoryId") String categoryId){
         List<Article> articles = this.articleService.getArticlesByCategory(categoryId);
-        List<ArticleDto> articleDtoList =  this.util.convertArticlesToArticleDtos(articles);
+        List<ArticleDto> articleDtoList =  this.articleDto.convertArticlesToArticleDtos(articles);
         return new ResponseEntity<>(articleDtoList, HttpStatus.OK);
     }
 
     @GetMapping("public/articles-search-by-year")
     public ResponseEntity<List<ArticleDto>> searchArticlesByYear(@RequestParam("year") int year){
         List<Article> articles = this.articleService.searchArticlesByYear(year);
-        List<ArticleDto> articleDtos = this.util.convertArticlesToArticleDtos(articles);
+        List<ArticleDto> articleDtos = this.articleDto.convertArticlesToArticleDtos(articles);
         return new ResponseEntity<>(articleDtos, HttpStatus.OK);
     }
 }

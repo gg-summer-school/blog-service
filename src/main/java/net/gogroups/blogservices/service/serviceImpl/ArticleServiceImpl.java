@@ -14,17 +14,16 @@ import net.gogroups.blogservices.repository.UserRepository;
 import net.gogroups.blogservices.service.ArticleService;
 import net.gogroups.blogservices.util.ArticleUpload;
 import net.gogroups.blogservices.util.Util;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.net.MalformedURLException;
 import java.nio.file.Path;
@@ -43,14 +42,13 @@ public class ArticleServiceImpl  implements ArticleService {
     UserRepository userRepository;
     @Autowired
     CategoryRepository categoryRepository;
-    private Util util = new Util();
-    private ArticleUpload articleUpload = new ArticleUpload();
+    private final Util util = new Util();
+    private final ArticleUpload articleUpload = new ArticleUpload();
     @Autowired
     private TransactionRepository transactionRepository;
     @Autowired
     ContributorServiceImpl contributorService;
-    @Autowired
-    private ModelMapper modelMapper;
+    private final ArticleDto articleDto = new ArticleDto();
 
 
 
@@ -117,7 +115,7 @@ public class ArticleServiceImpl  implements ArticleService {
         Page<Article> articles = articleRepository.findAll(pageable);
         List<Article> articleList = articles.getContent();
         List<ArticleDto> articleDtos = articleList.
-                stream().map(article -> this.modelMapper.map(article, ArticleDto.class)).
+                stream().map(article -> this.articleDto.convertArticleToArticleDto(article)).
                 collect(Collectors.toList());
         ArticleResponse articleResponse = new ArticleResponse();
         articleResponse.setArticleDtoList(articleDtos);
@@ -148,6 +146,7 @@ public class ArticleServiceImpl  implements ArticleService {
         if(!article.get().getUser().getId().equals(authUser.getId())){
             throw new ForbiddenException("Permission denied");
         }
+
         return article.get();
     }
 
@@ -258,4 +257,5 @@ public class ArticleServiceImpl  implements ArticleService {
         return articles;
     }
 
+     
 }
