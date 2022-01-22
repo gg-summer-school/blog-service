@@ -121,8 +121,8 @@ public class ArticleServiceImpl  implements ArticleService {
         articleResponse.setArticleDtoList(articleDtos);
         articleResponse.setPageNo(articles.getNumber());
         articleResponse.setPageSize(articles.getSize());
-        articleResponse.setTotalElements(articleResponse.getTotalElements());
-        articleResponse.setTotalPages(articleResponse.getTotalPages());
+        articleResponse.setTotalElements(articles.getTotalElements());
+        articleResponse.setTotalPages(articles.getTotalPages());
         articleResponse.setLast(articles.isLast());
         return articleResponse;
     }
@@ -151,9 +151,14 @@ public class ArticleServiceImpl  implements ArticleService {
     }
 
     @Override
-    public Article getSingleArticle(String articleId) {
+    public Article getSingleArticle(String articleId, String userId) {
         Optional<Article> article = articleRepository.findById(articleId);
         article.orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        Optional<Transaction> transaction = transactionRepository.
+                findAll().
+                stream().
+                filter(transaction1 -> transaction1.getUser().getId().equals(userId)).findFirst();
+        transaction.orElseThrow(() -> new ForbiddenException("User has not buy this article"));
         return article.get();
     }
 
