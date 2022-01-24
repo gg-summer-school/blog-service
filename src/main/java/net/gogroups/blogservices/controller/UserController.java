@@ -135,7 +135,7 @@ public class UserController {
 		return new ResponseEntity<>(new SuccessResponse(message, new Date(), ""), HttpStatus.OK);
 	}
 
-//	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("suspend/user/{user_id}")
 	public ResponseEntity<SuccessResponse> suspendUser(@PathVariable String user_id,
 			@Valid @RequestBody SuspendUserPayload suspendUserPayload) {
@@ -180,7 +180,7 @@ public class UserController {
 
 	}
 
-//	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("addrole/users/{user_id}")
 	public ResponseEntity<SuccessResponse> addRole(@PathVariable String user_id,
 			@RequestBody AddRolePayload addRolePayload) {
@@ -200,7 +200,7 @@ public class UserController {
 		return new ResponseEntity<>(userDTOs, HttpStatus.OK);
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
+//	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("user/{publisher_id}")
 	public ResponseEntity<SuccessResponse> declinePulisher(@PathVariable("publisher_id") String publisher_id) {
 		userService.declinePublisher(publisher_id);
