@@ -17,9 +17,7 @@ public interface UserService {
 	List<User> getAllReaders();
 	
 	List<User> getAllPublishers(boolean isApproved);
-	
-	User getAUser(String user_id);
-	
+		
 	void approvePublisher(String user_id, User user);
 	
 	void suspendUser(String user_id, User user);
