@@ -124,8 +124,8 @@ public class UserController {
 		return new ResponseEntity<>(listOfPublishersDTOs, HttpStatus.OK);
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("approve/user/{publisher_id}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<SuccessResponse> approvePublisher(@PathVariable String publisher_id,
 			@Valid @RequestBody ApproveUserPayload approveUserPayload) {
 		User user = modelMapper.map(approveUserPayload, User.class);
