@@ -26,6 +26,8 @@ public interface UserService {
 	
 	void addRole(String user_id, ERole role);
 	
+	void removeRole(String user_id, ERole role);
+	
     Transaction payForArticle(String user_id, String article_id, Transaction transaction);
 	
 	List<Transaction> getAllTransactionsOfAUser(String user_id);

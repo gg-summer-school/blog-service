@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import net.gogroups.blogservices.dto.TransactionDTO;
 import net.gogroups.blogservices.dto.UserDTO;
 import net.gogroups.blogservices.dto.UserDetailsDTO;
+import net.gogroups.blogservices.exception.ResourceNotFoundException;
 
 @RestController
 @RequestMapping("/api/protected/")
@@ -136,7 +137,7 @@ public class UserController {
 	}
 
 	@PreAuthorize("hasRole('ADMIN')")
-	@PatchMapping("suspend/user/{user_id}")
+	@PatchMapping("suspend/users/{user_id}")
 	public ResponseEntity<SuccessResponse> suspendUser(@PathVariable String user_id,
 			@Valid @RequestBody SuspendUserPayload suspendUserPayload) {
 		User user = modelMapper.map(suspendUserPayload, User.class);
@@ -147,7 +148,7 @@ public class UserController {
 	}
 
 	@PreAuthorize("hasRole('ADMIN')")
-	@PatchMapping("reactivate/user/{user_id}")
+	@PatchMapping("reactivate/users/{user_id}")
 	public ResponseEntity<SuccessResponse> reactivateUser(@PathVariable String user_id,
 			@Valid @RequestBody SuspendUserPayload suspendUserPayload) {
 		User user = modelMapper.map(suspendUserPayload, User.class);
@@ -158,7 +159,7 @@ public class UserController {
 	}
 
 	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER') or hasRole('ADMIN')")
-	@PostMapping("transactions/user/{user_id}/article/{article_id}")
+	@PostMapping("transactions/users/{user_id}/articles/{article_id}")
 	public ResponseEntity<?> payForArticleByUser(@PathVariable String user_id, @PathVariable String article_id,
 			@Valid @RequestBody TransactionPayload transactionPayload) {
 		Transaction transaction = modelMapper.map(transactionPayload, Transaction.class);
@@ -170,7 +171,7 @@ public class UserController {
 	}
 
 	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER')")
-	@GetMapping("/transactions/user/{user_id}")
+	@GetMapping("/transactions/users/{user_id}")
 	public ResponseEntity<List<TransactionDTO>> getAllTransactionsOfAUser(@PathVariable String user_id) {
 		List<Transaction> allTransactionsOfAUser = userService.getAllTransactionsOfAUser(user_id);
 		List<TransactionDTO> allTransactionDTOs = allTransactionsOfAUser.stream()
@@ -180,15 +181,32 @@ public class UserController {
 
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
+//	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("addrole/users/{user_id}")
 	public ResponseEntity<SuccessResponse> addRole(@PathVariable String user_id,
-			@RequestBody AddRolePayload addRolePayload) {
+			@RequestBody RolePayload addRolePayload) {
+		try {
 		ERole userRole = modelMapper.map(addRolePayload.getRole(), ERole.class);
 		userService.addRole(user_id, userRole);
 		String message = "Role added successfully";
 
 		return ResponseEntity.ok(new SuccessResponse(message, new Date(), ""));
+	} catch (Exception e) {
+		System.out.println(e.getMessage());
+		throw new ResourceNotFoundException("User doesn't exist");
+	}
+	}
+	
+//	@PreAuthorize("hasRole('ADMIN')")
+	@PatchMapping("removerole/users/{user_id}")
+	public ResponseEntity<SuccessResponse> removeRole(@PathVariable String user_id,
+			@RequestBody RolePayload removeRolePayload) {
+			ERole userRole = modelMapper.map(removeRolePayload.getRole(), ERole.class);
+			userService.removeRole(user_id, userRole);
+			String message = "Role removed successfully";
+
+			return ResponseEntity.ok(new SuccessResponse(message, new Date(), ""));
+		
 	}
 
 	@PreAuthorize("hasRole('ADMIN')")
@@ -201,7 +219,7 @@ public class UserController {
 	}
 
 //	@PreAuthorize("hasRole('ADMIN')")
-	@DeleteMapping("user/{publisher_id}")
+	@DeleteMapping("users/{publisher_id}")
 	public ResponseEntity<SuccessResponse> declinePulisher(@PathVariable("publisher_id") String publisher_id) {
 		userService.declinePublisher(publisher_id);
 		String message = "Publisher is declined";
