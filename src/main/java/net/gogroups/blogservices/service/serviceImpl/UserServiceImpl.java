@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import net.gogroups.blogservices.exception.ForbiddenException;
@@ -44,7 +43,7 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	ModelMapper modelMapper;
 
-	private Util util = new Util();
+    private final Util util = new Util();
 
 	@Override
 	public User editUser(User user) {
@@ -101,46 +100,28 @@ public class UserServiceImpl implements UserService {
 
 		return user;
 	}
-	
-	@Override
-	public User getAUser(String user_id) {
-		Optional<User> aUser = userRepository.findById(user_id);
-
-		checkingUserResource(user_id);
-
-		return aUser.get();
-	}
 
 	@Override
 	public void approvePublisher(String user_id, User user) {
-
-		Optional<User> userId = userRepository.findById(user_id);
-
 		 
-
-		checkingUserResource(user_id);
-
-		if (userId.get().isApproved()) {
+		User user1 = checkingUserId(user_id);
+		
+		if (user1.isApproved()) {
 			throw new  ResourceAlreadyExistException("Publisher is already approved");
 		} else {
-			userId.get().setApproved(user.isApproved());
-			userId.get().setId(userId.get().getId());
-			userRepository.save(userId.get());
+			user1.setApproved(user.isApproved());
+			userRepository.save(user1);
 		}
 
 	}
 	
 	@Override
 	public void suspendUser(String user_id, User user) {
+		User user1 = checkingUserId(user_id);
 
-		Optional<User> userId = userRepository.findById(user_id);
-
-		checkingUserResource(user_id);
-
-		if (userId.get().isActive()) {
-			userId.get().setActive(user.isActive());
-			userId.get().setId(userId.get().getId());
-			userRepository.save(userId.get());
+		if (user1.isActive()) {
+			user1.setActive(user.isActive());
+			userRepository.save(user1);
 
 		} else {
 			throw new ResourceAlreadyExistException("User is already suspended");
@@ -150,18 +131,14 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void reActivateUser(String user_id, User user) {
+		User user1 = checkingUserId(user_id);
 
-		Optional<User> userId = userRepository.findById(user_id);
-
-		checkingUserResource(user_id);
-
-		if (userId.get().isActive()) {
+		if (user1.isActive()) {
 			throw new ResourceAlreadyExistException("User is already active");
 
 		} else {
-			userId.get().setActive(user.isActive());
-			userId.get().setId(userId.get().getId());
-			userRepository.save(userId.get());
+			user1.setActive(user.isActive());
+			userRepository.save(user1);
 
 		}
 
@@ -169,21 +146,20 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Transaction payForArticle(String user_id, String article_id, Transaction transaction) {
-		Optional<User> user = userRepository.findById(user_id);
+		User user = checkingUserId(user_id);
+
 		Optional<Article> article = articleRepository.findById(article_id);
 
-		if (!user.get().isActive()) {
+		if (!user.isActive()) {
 			throw new ForbiddenException("User account is suspended");
 		}
 		
-		checkingUserResource(user_id);
-
 		if (!article.isPresent()) {
 			throw new ResourceNotFoundException("Article not found with id- " + article_id);
 		}
 
 		transaction.setId(util.generateId());
-		transaction.setUser(user.get());
+		transaction.setUser(user);
 		transaction.setArticle(article.get());
 		return transactionRepository.save(transaction);
 	}
@@ -191,11 +167,9 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List<Transaction> getAllTransactionsOfAUser(String user_id) {
 
-		Optional<User> userId = userRepository.findById(user_id);
+		User user = checkingUserId(user_id);
 
-		checkingUserResource(user_id);
-
-		List<Transaction> allTransactionsOfAUser = userId.get().getTransactions();
+		List<Transaction> allTransactionsOfAUser = user.getTransactions();
 		if (allTransactionsOfAUser.isEmpty()) {
 			throw new ResourceNotFoundException("No Transactions found under user with id- " + user_id);
 		}
@@ -204,20 +178,19 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void addRole(String user_id, ERole role) {
-		Optional<User> user = userRepository.findById(user_id);
-
-		checkingUserResource(user_id);
-
+		User user = checkingUserId(user_id);		
+		
 		Role newRole = roleRepository.findByRole(role);
-		for( Role userRole : user.get().getRole()) {
+		
+		for( Role userRole : user.getRole()) {
 			if(userRole.equals(newRole)) {
 				throw new ResourceAlreadyExistException("User already has the role: " + role);
 			}
 		}
 		
-		user.get().getRole().add(newRole);
+		user.getRole().add(newRole);
 		
-		userRepository.save(user.get());
+		userRepository.save(user);
 
 	}
 
@@ -233,23 +206,21 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void declinePublisher(String user_id) {
-		Optional<User> user = userRepository.findById(user_id);
+		User user = checkingUserId(user_id);
 		
-		checkingUserResource(user_id);
-		
-		 user.get().getRole()
+		 user.getRole()
 			.removeIf(role -> role.getRole().equals(ERole.ROLE_PUBLISHER));
 		 
-		userRepository.save(user.get());
+		userRepository.save(user);
 		
 		 
 	}
 
-	private void checkingUserResource(String resource) {
-		Optional<User> user = userRepository.findById(resource);
+	public User checkingUserId(String user_id) {
+		Optional<User> user = userRepository.findById(user_id);
 		if (!user.isPresent()) {
-			throw new ResourceNotFoundException("User not found with id- " + resource);
+			throw new ResourceNotFoundException("User not found with id- " + user_id);
 		}
+		return user.get();
 	}
-
 }

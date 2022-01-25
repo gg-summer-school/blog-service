@@ -13,11 +13,10 @@ public class FileUploadMvcConfig implements WebMvcConfigurer {
 
 
 
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        Path uploadCoverPageDir = Paths.get(AppConfig.FILEMAINDIRECTORY+"/"+AppConfig.ARTICLECOVERPAGEBASEDIRECTORY);
-        String uploadCoverPagePath = uploadCoverPageDir.toFile().getAbsolutePath();
-        registry.addResourceHandler("/"+ AppConfig.FILEMAINDIRECTORY+"/"+AppConfig.ARTICLECOVERPAGEBASEDIRECTORY+"/**").addResourceLocations("file:/"+ uploadCoverPagePath + "/");
-        
-    }
+//    @Override
+//    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+//        Path uploadCoverPageDir = Paths.get(AppConfig.FILEMAINDIRECTORY+"/"+AppConfig.ARTICLECOVERPAGEBASEDIRECTORY);
+//        String uploadCoverPagePath = uploadCoverPageDir.toFile().getAbsolutePath();
+//        registry.addResourceHandler("/"+ AppConfig.FILEMAINDIRECTORY+"/"+AppConfig.ARTICLECOVERPAGEBASEDIRECTORY+"/**").addResourceLocations("file:/"+ uploadCoverPagePath + "/");
+//    }
 }

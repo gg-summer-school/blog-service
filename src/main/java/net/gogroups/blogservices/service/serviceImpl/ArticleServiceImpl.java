@@ -56,7 +56,7 @@ public class ArticleServiceImpl  implements ArticleService {
     @Override
     public Article createArticle(Article article, String categoryId, String userId) {
         boolean isActive = this.checkIfUserIsActive(userId);
-        User publisher = this.getUserByToken(userId);
+        User publisher = this.getUserById(userId);
         if(!isActive){
             throw new ForbiddenException("User account is suspended");
         }else if(!publisher.isApproved()){
@@ -81,12 +81,26 @@ public class ArticleServiceImpl  implements ArticleService {
 
     @Override
     public boolean checkIfUserIsActive(String userId) {
-        User authUser = this.getUserByToken(userId);
+        User authUser = this.getUserById(userId);
         boolean isActive = true;
         if(!authUser.isActive()){
             isActive = false;
         }
         return isActive;
+    }
+
+    @Override
+    public boolean checkIfUserHasBoughtArticle(String articleId, String userId) {
+        boolean hasBought = false;
+        Optional<Transaction> transaction = this.transactionRepository.
+                findAll().
+                stream().
+                filter(transaction1 -> transaction1.getArticle().getId().equals(articleId) && transaction1.getUser().getId().equals(userId)).
+                findFirst();
+        if(!transaction.isEmpty()){
+            hasBought = true;
+        }
+        return hasBought;
     }
 
     @Override
@@ -99,12 +113,6 @@ public class ArticleServiceImpl  implements ArticleService {
         Article updatedArticle = articleRepository.saveAndFlush(article);
         return updatedArticle;
 
-    }
-
-    @Override
-    public void deleteArticle(String articleId, String categoryId, String publisherId) {
-        Article article = this.getArticleByPublisher(articleId, categoryId, publisherId);
-        articleRepository.delete(article);
     }
 
     @Override
@@ -121,15 +129,15 @@ public class ArticleServiceImpl  implements ArticleService {
         articleResponse.setArticleDtoList(articleDtos);
         articleResponse.setPageNo(articles.getNumber());
         articleResponse.setPageSize(articles.getSize());
-        articleResponse.setTotalElements(articleResponse.getTotalElements());
-        articleResponse.setTotalPages(articleResponse.getTotalPages());
+        articleResponse.setTotalElements(articles.getTotalElements());
+        articleResponse.setTotalPages(articles.getTotalPages());
         articleResponse.setLast(articles.isLast());
         return articleResponse;
     }
 
     @Override
     public List<Article> getAllArticlesByPublisher(String userId) {
-        User authUser =  this.getUserByToken(userId);
+        User authUser =  this.getUserById(userId);
         List<Article> articles = articleRepository.findAll()
                 .stream().filter((article -> article.getUser().getId().equals(authUser.getId()))).
                         collect(Collectors.toList());
@@ -138,7 +146,7 @@ public class ArticleServiceImpl  implements ArticleService {
 
     @Override
     public Article getArticleByPublisher(String articleId, String categoryId, String userId) {
-        User authUser =  this.getUserByToken(userId);
+        User authUser =  this.getUserById(userId);
         Optional<Article> article = articleRepository.findAll().stream().
                 filter((art) -> art.getId().equals(articleId) && art.getCategory().getId().equals(categoryId))
                 .findFirst();
@@ -158,7 +166,7 @@ public class ArticleServiceImpl  implements ArticleService {
     }
 
     @Override
-    public User getUserByToken(String userId){
+    public User getUserById(String userId){
         Optional<User> user =  userRepository.findById(userId);
         user.orElseThrow(() -> new UnAuthorizedException("Invalid user id"));
         return user.get();
@@ -199,12 +207,10 @@ public class ArticleServiceImpl  implements ArticleService {
 
     @Override
     public Article getBoughtArticle(String userId, String articleId) {
-        Optional<Transaction> transaction = this.transactionRepository.
-                findAll().
-                stream().
-                filter((transaction1 -> transaction1.getUser().getId().equals(userId))).
-                findFirst();
-        transaction.orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        boolean hasBought = this.checkIfUserHasBoughtArticle(articleId, userId);
+        if(!hasBought){
+            throw new ForbiddenException("User has not buy this article");
+        }
         Article article = this.articleRepository.findById(articleId).get();
         return article;
 
@@ -218,13 +224,17 @@ public class ArticleServiceImpl  implements ArticleService {
 
 
     @Override
-    public Resource loadFileAsResource(String articleId) {
+    public Resource loadFileAsResource(String articleId, String userId) {
         Path dirLocation;
         Optional<Article> downloadedArticle = this.articleRepository.findById(articleId);
         downloadedArticle.orElseThrow(() -> new ResourceNotFoundException("Article not found"));
-        Optional<Category> category = categoryRepository.findById(downloadedArticle.get().getCategory().getId());
-        category.orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-        dirLocation =  Paths.get(AppConfig.FILEMAINDIRECTORY+"/"+AppConfig.ARTICLEBASEDIRECTORY+"/"+category.get().getName()).
+        Optional<Transaction> getBoughtArticle = this.transactionRepository.findAll().
+                stream().
+                filter(transaction -> transaction.getUser().getId().equals(userId) && transaction.getArticle().getId().equals(downloadedArticle.get().getId())).
+                findFirst();
+        getBoughtArticle.orElseThrow(() -> new ForbiddenException("User has not buy this article"));
+        Category category = categoryRepository.findById(downloadedArticle.get().getCategory().getId()).get();
+        dirLocation =  Paths.get(AppConfig.FILEMAINDIRECTORY+"/"+AppConfig.ARTICLEBASEDIRECTORY+"/"+category.getName()).
                 toAbsolutePath().normalize();
         try {
             Path file = dirLocation.resolve(downloadedArticle.get().getDocument()).normalize();

@@ -124,16 +124,8 @@ public class UserController {
 		return new ResponseEntity<>(listOfPublishersDTOs, HttpStatus.OK);
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
-	@GetMapping("users/{user_id}")
-	public ResponseEntity<UserDTO> getUser(@PathVariable String user_id) {
-		User aUser = userService.getAUser(user_id);
-		UserDTO userDto = modelMapper.map(aUser, UserDTO.class);
-		return new ResponseEntity<>(userDto, HttpStatus.OK);
-	}
-
-	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("approve/user/{publisher_id}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<SuccessResponse> approvePublisher(@PathVariable String publisher_id,
 			@Valid @RequestBody ApproveUserPayload approveUserPayload) {
 		User user = modelMapper.map(approveUserPayload, User.class);
@@ -145,7 +137,7 @@ public class UserController {
 
 //	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("suspend/user/{user_id}")
-	public ResponseEntity<SuccessResponse> suspendAUer(@PathVariable String user_id,
+	public ResponseEntity<SuccessResponse> suspendUser(@PathVariable String user_id,
 			@Valid @RequestBody SuspendUserPayload suspendUserPayload) {
 		User user = modelMapper.map(suspendUserPayload, User.class);
 		userService.suspendUser(user_id, user);
@@ -156,7 +148,7 @@ public class UserController {
 
 	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("reactivate/user/{user_id}")
-	public ResponseEntity<SuccessResponse> reactivateAUer(@PathVariable String user_id,
+	public ResponseEntity<SuccessResponse> reactivateUser(@PathVariable String user_id,
 			@Valid @RequestBody SuspendUserPayload suspendUserPayload) {
 		User user = modelMapper.map(suspendUserPayload, User.class);
 		userService.reActivateUser(user_id, user);
@@ -208,7 +200,7 @@ public class UserController {
 		return new ResponseEntity<>(userDTOs, HttpStatus.OK);
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
+//	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("user/{publisher_id}")
 	public ResponseEntity<SuccessResponse> declinePulisher(@PathVariable("publisher_id") String publisher_id) {
 		userService.declinePublisher(publisher_id);
