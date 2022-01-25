@@ -149,6 +149,13 @@ public class UserServiceImpl implements UserService {
 		User user = checkingUserId(user_id);
 
 		Optional<Article> article = articleRepository.findById(article_id);
+		
+		Optional<Transaction> transaction_user = transactionRepository.findById(user_id);
+		Optional<Transaction> transaction_article = transactionRepository.findById(article_id);
+		
+		if(transaction_user.isPresent() &&  transaction_article.isPresent()) {
+			throw new ResourceAlreadyExistException("This article has been paid for already");
+		}
 
 		if (!user.isActive()) {
 			throw new ForbiddenException("User account is suspended");
