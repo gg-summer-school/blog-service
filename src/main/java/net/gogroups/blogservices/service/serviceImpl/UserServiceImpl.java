@@ -149,6 +149,13 @@ public class UserServiceImpl implements UserService {
 		User user = checkingUserId(user_id);
 
 		Optional<Article> article = articleRepository.findById(article_id);
+		
+		Optional<Transaction> transaction_user = transactionRepository.findById(user_id);
+		Optional<Transaction> transaction_article = transactionRepository.findById(article_id);
+		
+		if(transaction_user.isPresent() &&  transaction_article.isPresent()) {
+			throw new ResourceAlreadyExistException("This article has been paid for already");
+		}
 
 		if (!user.isActive()) {
 			throw new ForbiddenException("User account is suspended");
@@ -193,6 +200,19 @@ public class UserServiceImpl implements UserService {
 		userRepository.save(user);
 
 	}
+	
+	@Override
+	public void removeRole(String user_id, ERole role) {
+		User user = checkingUserId(user_id);
+		
+		Role newRole = roleRepository.findByRole(role);
+		
+		user.getRole().remove(newRole);
+		
+		userRepository.save(user);
+		
+	}
+
 
 	@Override
 	public List<User> searchUsers(String name) {
@@ -215,7 +235,7 @@ public class UserServiceImpl implements UserService {
 		
 		 
 	}
-
+	
 	public User checkingUserId(String user_id) {
 		Optional<User> user = userRepository.findById(user_id);
 		if (!user.isPresent()) {
