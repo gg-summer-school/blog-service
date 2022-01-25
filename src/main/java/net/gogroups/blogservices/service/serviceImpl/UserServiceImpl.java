@@ -207,12 +207,6 @@ public class UserServiceImpl implements UserService {
 		
 		Role newRole = roleRepository.findByRole(role);
 		
-		for( Role userRole : user.getRole()) {
-			if(!userRole.equals(newRole)) {
-				throw new ResourceNotFoundException("User doesn't have the role: " + role);
-			}
-		}
-		
 		user.getRole().remove(newRole);
 		
 		userRepository.save(user);
