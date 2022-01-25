@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-public class AddRolePayload {
+public class RolePayload {
 
      
     private ERole role;

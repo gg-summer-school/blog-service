@@ -193,6 +193,25 @@ public class UserServiceImpl implements UserService {
 		userRepository.save(user);
 
 	}
+	
+	@Override
+	public void removeRole(String user_id, ERole role) {
+		User user = checkingUserId(user_id);
+		
+		Role newRole = roleRepository.findByRole(role);
+		
+		for( Role userRole : user.getRole()) {
+			if(!userRole.equals(newRole)) {
+				throw new ResourceNotFoundException("User doesn't have the role: " + role);
+			}
+		}
+		
+		user.getRole().remove(newRole);
+		
+		userRepository.save(user);
+		
+	}
+
 
 	@Override
 	public List<User> searchUsers(String name) {
@@ -215,7 +234,7 @@ public class UserServiceImpl implements UserService {
 		
 		 
 	}
-
+	
 	public User checkingUserId(String user_id) {
 		Optional<User> user = userRepository.findById(user_id);
 		if (!user.isPresent()) {
