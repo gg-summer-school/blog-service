@@ -1,18 +1,23 @@
 package net.gogroups.blogservices.dto;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.gogroups.blogservices.config.AppConfig;
+import net.gogroups.blogservices.exception.CustomIOException;
+import net.gogroups.blogservices.exception.ResourceNotFoundException;
 import net.gogroups.blogservices.model.Article;
-import net.gogroups.blogservices.model.Category;
 import net.gogroups.blogservices.model.Contributor;
+import org.apache.tika.Tika;
+import org.jsoup.helper.StringUtil;
+import org.springframework.util.StringUtils;
 
+import javax.xml.bind.DatatypeConverter;
+import java.io.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,8 +31,6 @@ public class ArticleDto {
     private String title;
     private String articleAbstract;
     private String toc;
-    private String coverPage;
-    private String document;
     private BigDecimal price;
     private String  userId;
     private String categoryId;
@@ -35,11 +38,13 @@ public class ArticleDto {
     private List<Contributor> contributors;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String coverPage;
 
 
 
     public ArticleDto convertArticleToArticleDto(Article article) {
         ArticleDto articleDto = new ArticleDto();
+        String base64 = this.convertImageToBase64(article);
         articleDto.setId(article.getId());
         articleDto.setTitle(this.title = article.getTitle());
         articleDto.setArticleAbstract(this.articleAbstract = article.getArticleAbstract());
@@ -51,16 +56,7 @@ public class ArticleDto {
         articleDto.setContributors(article.getContributors());
         articleDto.setCreatedAt(article.getCreatedAt());
         articleDto.setUpdatedAt(article.getUpdatedAt());   
-        Path coverPagePath = Paths.get(AppConfig.FILEMAINDIRECTORY+ "/" +
-                AppConfig.ARTICLECOVERPAGEBASEDIRECTORY + "/" +
-                article.getCategory().getName());
-        Path documentPath = Paths.get(AppConfig.FILEMAINDIRECTORY+ "/" +
-                AppConfig.ARTICLEBASEDIRECTORY + "/" +
-                article.getCategory().getName());
-        Path rootCoverPagePath = coverPagePath.resolve(article.getCoverPage());
-        Path rootDocumentPath = documentPath.resolve(article.getDocument());
-        articleDto.setCoverPage(rootCoverPagePath.toUri().toString());
-        articleDto.setDocument(rootDocumentPath.toUri().toString());
+        articleDto.setCoverPage("data:" + this.getFileExtension(article.getCoverPage()) + ";base64," + base64);
         return articleDto;
     }
 
@@ -68,6 +64,28 @@ public class ArticleDto {
         List<ArticleDto> articleDtos = articles.
                 stream().map(article -> this.convertArticleToArticleDto(article)).collect(Collectors.toList());
         return articleDtos;
+    }
+
+
+    private String convertImageToBase64(Article article){
+        String base64Image ="";
+        File file = new File(AppConfig.FILEMAINDIRECTORY + "/" +AppConfig.ARTICLECOVERPAGEBASEDIRECTORY+ "/"+ article.getCategory().getName()+ "/" + article.getCoverPage());
+        try {
+            InputStream inputStream = new FileInputStream(file.getPath());
+            base64Image = Base64.getEncoder().encodeToString(inputStream.readAllBytes());
+        } catch (FileNotFoundException e) {
+           throw new CustomIOException("File not found");
+        } catch (IOException e) {
+            throw new CustomIOException("Could not read file content");
+        }
+        return base64Image;
+    }
+
+    private String getFileExtension(String coverPage) {
+        if(StringUtil.isBlank(coverPage)){
+            throw new ResourceNotFoundException("Article CoverPage not found");
+        }
+        return "image/"+coverPage.split("\\.")[1];
     }
 
 

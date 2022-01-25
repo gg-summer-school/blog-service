@@ -20,6 +20,7 @@
 		<jsonwebtoken.version>0.9.1</jsonwebtoken.version>
 		<modelmapper.version>2.4.3</modelmapper.version>
 		<springfox.version>3.0.0</springfox.version>
+
 	</properties>
 	<dependencies>
 		<dependency>
@@ -84,6 +85,7 @@
 			<artifactId>h2</artifactId>
 			<scope>test</scope>
 		</dependency>
+
 	</dependencies>
 
 	<build>
