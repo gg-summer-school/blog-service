@@ -143,7 +143,7 @@ public class UserController {
 		return new ResponseEntity<>(new SuccessResponse(message, new Date(), ""), HttpStatus.OK);
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
+//	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("suspend/user/{user_id}")
 	public ResponseEntity<SuccessResponse> suspendAUer(@PathVariable String user_id,
 			@Valid @RequestBody SuspendUserPayload suspendUserPayload) {

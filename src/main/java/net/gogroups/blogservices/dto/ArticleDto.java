@@ -54,9 +54,15 @@ public class ArticleDto {
         articleDto.setDocument("/" + AppConfig.FILEMAINDIRECTORY+ "/" +
                 AppConfig.ARTICLEBASEDIRECTORY + "/" +
                 article.getCategory().getName() + "/" +article.getDocument());
-        articleDto.setCoverPage("/" + AppConfig.FILEMAINDIRECTORY+ "/" +
+         
+        Path path = Paths.get(AppConfig.FILEMAINDIRECTORY+ "/" +
                 AppConfig.ARTICLECOVERPAGEBASEDIRECTORY + "/" +
                 article.getCategory().getName() + "/" +article.getCoverPage());
+        String filePath = path.toAbsolutePath().toString();
+        System.out.println(filePath);
+        articleDto.setCoverPage((AppConfig.FILEMAINDIRECTORY+ "/" +
+                AppConfig.ARTICLECOVERPAGEBASEDIRECTORY + "/" +
+                article.getCategory().getName() + "/" +article.getCoverPage()));
         return articleDto;
     }
 
