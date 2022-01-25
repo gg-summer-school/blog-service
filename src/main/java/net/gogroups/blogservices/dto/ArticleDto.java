@@ -50,13 +50,17 @@ public class ArticleDto {
         articleDto.setCategoryName(article.getCategory().getName());
         articleDto.setContributors(article.getContributors());
         articleDto.setCreatedAt(article.getCreatedAt());
-        articleDto.setUpdatedAt(article.getUpdatedAt());
-        articleDto.setDocument("/" + AppConfig.FILEMAINDIRECTORY+ "/" +
-                AppConfig.ARTICLEBASEDIRECTORY + "/" +
-                article.getCategory().getName() + "/" +article.getDocument());
-        articleDto.setCoverPage("/" + AppConfig.FILEMAINDIRECTORY+ "/" +
+        articleDto.setUpdatedAt(article.getUpdatedAt());   
+        Path coverPagePath = Paths.get(AppConfig.FILEMAINDIRECTORY+ "/" +
                 AppConfig.ARTICLECOVERPAGEBASEDIRECTORY + "/" +
-                article.getCategory().getName() + "/" +article.getCoverPage());
+                article.getCategory().getName());
+        Path documentPath = Paths.get(AppConfig.FILEMAINDIRECTORY+ "/" +
+                AppConfig.ARTICLEBASEDIRECTORY + "/" +
+                article.getCategory().getName());
+        Path rootCoverPagePath = coverPagePath.resolve(article.getCoverPage());
+        Path rootDocumentPath = documentPath.resolve(article.getDocument());
+        articleDto.setCoverPage(rootCoverPagePath.toUri().toString());
+        articleDto.setDocument(rootDocumentPath.toUri().toString());
         return articleDto;
     }
 
