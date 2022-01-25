@@ -182,7 +182,7 @@ public class UserController {
 	}
 
 	@PreAuthorize("hasRole('ADMIN')")
-	@PatchMapping("addrole/users/{user_id}")
+	@PatchMapping("add-role/users/{user_id}")
 	public ResponseEntity<SuccessResponse> addRole(@PathVariable String user_id,
 			@RequestBody RolePayload addRolePayload) {
 		try {
@@ -198,7 +198,7 @@ public class UserController {
 	}
 	
 	@PreAuthorize("hasRole('ADMIN')")
-	@PatchMapping("removerole/users/{user_id}")
+	@PatchMapping("remove-role/users/{user_id}")
 	public ResponseEntity<SuccessResponse> removeRole(@PathVariable String user_id,
 			@RequestBody RolePayload removeRolePayload) {
 			ERole userRole = modelMapper.map(removeRolePayload.getRole(), ERole.class);
