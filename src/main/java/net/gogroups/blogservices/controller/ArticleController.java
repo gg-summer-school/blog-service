@@ -88,15 +88,6 @@ public class ArticleController {
         return new ResponseEntity<>(articleDto, HttpStatus.ACCEPTED);
     }
 
-    @ApiOperation(value = "", authorizations = {
-            @Authorization(value = "jwtToken") })
-    @DeleteMapping("protected/publishers/{publisherId}/articles/{articleId}/categories/{categoryId}")
-    @PreAuthorize("hasRole('PUBLISHER')")
-    public ResponseEntity<?> deleteArticle(@PathVariable String articleId,
-                                           @PathVariable  String categoryId, @PathVariable  String publisherId){
-        this.articleService.deleteArticle(articleId, categoryId, publisherId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
 
     @GetMapping("public/articles")
     public ResponseEntity<ArticleResponse> getAllArticles(
@@ -131,12 +122,9 @@ public class ArticleController {
         return new ResponseEntity<>(articleDto,HttpStatus.OK);
     }
 
-    @GetMapping("protected/articles")
-    @ApiOperation(value = "", authorizations = {
-            @Authorization(value = "jwtToken") })
-    public ResponseEntity<ArticleDto> getArticle(@RequestParam("articleId") String articleId,
-                                                 @RequestParam("userId") String userId){
-        Article article = this.articleService.getSingleArticle(articleId, userId);
+    @GetMapping("public/articles/{articleId}")
+    public ResponseEntity<ArticleDto> getArticle(@PathVariable String articleId){
+        Article article = this.articleService.getSingleArticle(articleId);
         ArticleDto articleDto = this.articleDto.convertArticleToArticleDto(article);
         return new ResponseEntity<>(articleDto,HttpStatus.OK);
     }
@@ -169,12 +157,13 @@ public class ArticleController {
         return new ResponseEntity<>(articleDtos, HttpStatus.OK);
     }
 
-    @PostMapping("protected/articles")
+    @PostMapping("protected/users/{userId}/articles/{articleId}")
     @ApiOperation(value = "", authorizations = {
             @Authorization(value = "jwtToken") })
-    public ResponseEntity<Resource> downloadFile(@RequestParam("articleId") String articleId,
+    public ResponseEntity<Resource> downloadFile(@PathVariable("articleId") String articleId,
+                                                 @PathVariable("userId") String userId,
                                                  HttpServletRequest request) throws IOException {
-        Resource resource = this.articleService.loadFileAsResource(articleId);
+        Resource resource = this.articleService.loadFileAsResource(articleId, userId);
         String contentType;
         contentType  = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
         if(contentType == null) {
@@ -198,5 +187,13 @@ public class ArticleController {
         List<Article> articles = this.articleService.searchArticlesByYear(year);
         List<ArticleDto> articleDtos = this.articleDto.convertArticlesToArticleDtos(articles);
         return new ResponseEntity<>(articleDtos, HttpStatus.OK);
+    }
+
+    @GetMapping("protected/users/{userId}/articles/{articleId}/check-if-user-has-bought-article")
+    @ApiOperation(value = "", authorizations = {
+            @Authorization(value = "jwtToken") })
+    public ResponseEntity<?> checkIfUserHasBoughtArticle(@PathVariable String userId, @PathVariable String articleId){
+        boolean hasBought = this.articleService.checkIfUserHasBoughtArticle(articleId, userId);
+        return new ResponseEntity<>(hasBought, HttpStatus.OK);
     }
 }
