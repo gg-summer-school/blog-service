@@ -9,11 +9,8 @@ import net.gogroups.blogservices.exception.CustomIOException;
 import net.gogroups.blogservices.exception.ResourceNotFoundException;
 import net.gogroups.blogservices.model.Article;
 import net.gogroups.blogservices.model.Contributor;
-import org.apache.tika.Tika;
-import org.jsoup.helper.StringUtil;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
-import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -82,7 +79,7 @@ public class ArticleDto {
     }
 
     private String getFileExtension(String coverPage) {
-        if(StringUtil.isBlank(coverPage)){
+        if(StringUtils.isBlank(coverPage)){
             throw new ResourceNotFoundException("Article CoverPage not found");
         }
         return "image/"+coverPage.split("\\.")[1];
