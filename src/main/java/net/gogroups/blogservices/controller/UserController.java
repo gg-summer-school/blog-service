@@ -125,7 +125,7 @@ public class UserController {
 		return new ResponseEntity<>(listOfPublishersDTOs, HttpStatus.OK);
 	}
 
-	@PatchMapping("approve/user/{publisher_id}")
+	@PatchMapping("approve/users/{publisher_id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<SuccessResponse> approvePublisher(@PathVariable String publisher_id,
 			@Valid @RequestBody ApproveUserPayload approveUserPayload) {
@@ -185,16 +185,12 @@ public class UserController {
 	@PatchMapping("add-role/users/{user_id}")
 	public ResponseEntity<SuccessResponse> addRole(@PathVariable String user_id,
 			@RequestBody RolePayload addRolePayload) {
-		try {
+		
 		ERole userRole = modelMapper.map(addRolePayload.getRole(), ERole.class);
 		userService.addRole(user_id, userRole);
 		String message = "Role added successfully";
 
 		return ResponseEntity.ok(new SuccessResponse(message, new Date(), ""));
-	} catch (Exception e) {
-		System.out.println(e.getMessage());
-		throw new ResourceNotFoundException("User doesn't exist");
-	}
 	}
 	
 	@PreAuthorize("hasRole('ADMIN')")
@@ -210,7 +206,7 @@ public class UserController {
 	}
 
 	@PreAuthorize("hasRole('ADMIN')")
-	@GetMapping("/users/{user_name})")
+	@GetMapping("/users/{user_name}")
 	public ResponseEntity<List<UserDTO>> searchUser(@PathVariable String user_name) {
 		List<User> users = userService.searchUsers(user_name);
 		List<UserDTO> userDTOs = getListOfUserResourceDTOs(users);
