@@ -147,7 +147,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public Transaction payForArticle(String user_id, String article_id, Transaction transaction) {
 		User user = checkingUserId(user_id);
-		String message = "User account has been suspended, you can't pay for atrics";
+		String message = "User account has been suspended, you can't buy this article";
 		if(!user.isActive()) {
 			throw new ResourceNotFoundException(message);
 		}
