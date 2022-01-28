@@ -235,7 +235,16 @@ public class UserServiceImpl implements UserService {
 		
 		 
 	}
-	
+
+	@Override
+	public User getPublisherByTheirArticleId(String articleId) {
+		Optional<Article> article = this.articleRepository.findById(articleId);
+		article.orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+		Optional<User> user = this.userRepository.findById(article.get().getUser().getId());
+		return user.get();
+	}
+
+
 	public User checkingUserId(String user_id) {
 		Optional<User> user = userRepository.findById(user_id);
 		if (!user.isPresent()) {

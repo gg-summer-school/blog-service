@@ -35,5 +35,7 @@ public interface UserService {
 	List<User> searchUsers(String name);
 	
 	void declinePublisher(String user_id);
+
+	User getPublisherByTheirArticleId(String articleId);
 	
 }

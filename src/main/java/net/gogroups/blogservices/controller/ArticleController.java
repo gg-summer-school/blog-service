@@ -157,7 +157,7 @@ public class ArticleController {
         return new ResponseEntity<>(articleDtos, HttpStatus.OK);
     }
 
-    @PostMapping("protected/users/{userId}/articles/{articleId}")
+    @GetMapping("protected/users/{userId}/articles/{articleId}")
     @ApiOperation(value = "", authorizations = {
             @Authorization(value = "jwtToken") })
     public ResponseEntity<Resource> downloadFile(@PathVariable("articleId") String articleId,
@@ -166,12 +166,9 @@ public class ArticleController {
         Resource resource = this.articleService.loadFileAsResource(articleId, userId);
         String contentType;
         contentType  = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-        if(contentType == null) {
-            contentType = "application/octet-stream";
-        }
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
     }
 
