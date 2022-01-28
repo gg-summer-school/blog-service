@@ -147,6 +147,10 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public Transaction payForArticle(String user_id, String article_id, Transaction transaction) {
 		User user = checkingUserId(user_id);
+		String message = "User account has been suspended, you can't buy this article";
+		if(!user.isActive()) {
+			throw new ResourceNotFoundException(message);
+		}
 
 		Optional<Article> article = articleRepository.findById(article_id);
 		
@@ -206,7 +210,7 @@ public class UserServiceImpl implements UserService {
 		User user = checkingUserId(user_id);
 		
 		Role newRole = roleRepository.findByRole(role);
-		
+				
 		user.getRole().remove(newRole);
 		
 		userRepository.save(user);
