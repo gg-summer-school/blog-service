@@ -11,10 +11,12 @@ import net.gogroups.blogservices.model.Article;
 import net.gogroups.blogservices.model.Contributor;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,16 +34,16 @@ public class ArticleDto {
     private String  userId;
     private String categoryId;
     private String categoryName;
+    private String contentType;
     private List<Contributor> contributors;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private String coverPage;
+    private byte[] coverPage;
 
 
 
     public ArticleDto convertArticleToArticleDto(Article article) {
         ArticleDto articleDto = new ArticleDto();
-        String base64 = this.convertImageToBase64(article);
         articleDto.setId(article.getId());
         articleDto.setTitle(this.title = article.getTitle());
         articleDto.setArticleAbstract(this.articleAbstract = article.getArticleAbstract());
@@ -52,8 +54,9 @@ public class ArticleDto {
         articleDto.setCategoryName(article.getCategory().getName());
         articleDto.setContributors(article.getContributors());
         articleDto.setCreatedAt(article.getCreatedAt());
-        articleDto.setUpdatedAt(article.getUpdatedAt());   
-        articleDto.setCoverPage("data:" + this.getFileExtension(article.getCoverPage()) + ";base64," + base64);
+        articleDto.setUpdatedAt(article.getUpdatedAt());
+        articleDto.setContentType(this.getFileExtension(article.getCoverPage()));
+        articleDto.setCoverPage(this.getImageBytes(article));
         return articleDto;
     }
 
@@ -64,18 +67,16 @@ public class ArticleDto {
     }
 
 
-    private String convertImageToBase64(Article article){
-        String base64Image ="";
+    private  byte[] getImageBytes(Article article){
+        byte[] bytes;
         File file = new File(AppConfig.FILEMAINDIRECTORY + "/" +AppConfig.ARTICLECOVERPAGEBASEDIRECTORY+ "/"+ article.getCategory().getName()+ "/" + article.getCoverPage());
         try {
             InputStream inputStream = new FileInputStream(file.getPath());
-            base64Image = Base64.getEncoder().encodeToString(inputStream.readAllBytes());
-        } catch (FileNotFoundException e) {
-           throw new CustomIOException("File not found");
+            bytes = (inputStream.readAllBytes());
         } catch (IOException e) {
             throw new CustomIOException("Could not read file content");
         }
-        return base64Image;
+        return bytes;
     }
 
     private String getFileExtension(String coverPage) {

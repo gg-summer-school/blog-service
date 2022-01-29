@@ -181,7 +181,7 @@ public class UserController {
 
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
+	//@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("add-role/users/{user_id}")
 	public ResponseEntity<SuccessResponse> addRole(@PathVariable String user_id,
 			@RequestBody RolePayload addRolePayload) {
@@ -189,7 +189,6 @@ public class UserController {
 		ERole userRole = modelMapper.map(addRolePayload.getRole(), ERole.class);
 		userService.addRole(user_id, userRole);
 		String message = "Role added successfully";
-
 		return ResponseEntity.ok(new SuccessResponse(message, new Date(), ""));
 	}
 	
