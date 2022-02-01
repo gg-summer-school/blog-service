@@ -160,7 +160,7 @@ public class ArticleController {
     @GetMapping("protected/users/{userId}/articles/{articleId}")
     @ApiOperation(value = "", authorizations = {
             @Authorization(value = "jwtToken") })
-    public ResponseEntity<Resource> downloadFile(@PathVariable("articleId") String articleId,
+    public ResponseEntity<Resource> previewFile(@PathVariable("articleId") String articleId,
                                                  @PathVariable("userId") String userId,
                                                  HttpServletRequest request) throws IOException {
         Resource resource = this.articleService.loadFileAsResource(articleId, userId);
@@ -168,7 +168,7 @@ public class ArticleController {
         contentType  = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
     }
 

@@ -228,11 +228,13 @@ public class ArticleServiceImpl  implements ArticleService {
         Path dirLocation;
         Optional<Article> downloadedArticle = this.articleRepository.findById(articleId);
         downloadedArticle.orElseThrow(() -> new ResourceNotFoundException("Article not found"));
-        Optional<Transaction> getBoughtArticle = this.transactionRepository.findAll().
-                stream().
-                filter(transaction -> transaction.getUser().getId().equals(userId) && transaction.getArticle().getId().equals(downloadedArticle.get().getId())).
-                findFirst();
-        getBoughtArticle.orElseThrow(() -> new ForbiddenException("User has not buy this article"));
+        if(!downloadedArticle.get().getUser().getId().equals(userId)){
+            Optional<Transaction> getBoughtArticle = this.transactionRepository.findAll().
+                    stream().
+                    filter(transaction -> transaction.getUser().getId().equals(userId) && transaction.getArticle().getId().equals(downloadedArticle.get().getId())).
+                    findFirst();
+            getBoughtArticle.orElseThrow(() -> new ForbiddenException("User has not buy this article"));
+        }
         Category category = categoryRepository.findById(downloadedArticle.get().getCategory().getId()).get();
         dirLocation =  Paths.get(AppConfig.FILEMAINDIRECTORY+"/"+AppConfig.ARTICLEBASEDIRECTORY+"/"+category.getName()).
                 toAbsolutePath().normalize();
