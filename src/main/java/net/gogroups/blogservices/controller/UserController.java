@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.nio.file.attribute.UserPrincipalNotFoundException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -60,8 +61,6 @@ public class UserController {
 
 	@ApiOperation(value = "This method is used to edit user details.", authorizations = {
 			@Authorization(value = "jwtToken") })
-
-	@PreAuthorize("hasRole('ADMIN') or hasRole('READER') or hasRole('PUBLISHER')")
 	@PatchMapping("/users/user_profile")
 	public ResponseEntity<User> editUserInfo(@Valid @RequestBody UserPayload editUserPayload) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -82,7 +81,6 @@ public class UserController {
 
 	@ApiOperation(value = "This method is used to edit user password", authorizations = {
 			@Authorization(value = "jwtToken") })
-	@PreAuthorize("hasRole('ADMIN') or hasRole('READER') or hasRole('PUBLISHER')")
 	@PatchMapping("/users/user_profile/change_password")
 	public ResponseEntity<MessageResponse> changePassword(
 			@Valid @RequestBody UserPasswordChangePayload oldUserPasswordPayload) {
