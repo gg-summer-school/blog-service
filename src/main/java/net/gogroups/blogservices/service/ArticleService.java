@@ -22,7 +22,8 @@ public interface ArticleService {
     public List<Article> getAllBoughtArticles(String userId);
     public Article getBoughtArticle(String userId, String articleId);
     public List<Article> searchArticlesByTitle(String title);
-    public  Resource loadFileAsResource(String articleId, String userId);
+    public  Resource loadFileAsResource(String articleId);
+    public Resource loadArticleCoverPage(String articleId);
     public List<Article> getArticlesByCategory(String categoryId);
     public List<Article> searchArticlesByYear(int year);
 

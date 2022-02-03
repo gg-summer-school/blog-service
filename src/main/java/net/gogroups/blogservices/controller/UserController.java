@@ -101,6 +101,17 @@ public class UserController {
 			return new ResponseEntity<>(new MessageResponse("Password Updated"), HttpStatus.ACCEPTED);
 		}
 	}
+	
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping("users")
+	public ResponseEntity<List<UserDTO>> getUsers() {
+		
+		List<User> allUsers = userService.getAllUsers();
+		List<UserDTO> listofUserDTOs = getListOfUserResourceDTOs(allUsers);
+		
+		return new ResponseEntity<>(listofUserDTOs, HttpStatus.OK);
+		
+	}
 
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("users/readers")

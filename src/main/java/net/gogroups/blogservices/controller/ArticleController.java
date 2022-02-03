@@ -4,15 +4,14 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
 import net.gogroups.blogservices.config.AppConfig;
 import net.gogroups.blogservices.dto.ArticleDto;
-import net.gogroups.blogservices.payload.request.ArticlePayload;
 import net.gogroups.blogservices.dto.ArticleResponse;
-import net.gogroups.blogservices.payload.request.UpdateArticlePayload;
 import net.gogroups.blogservices.model.Article;
+import net.gogroups.blogservices.payload.request.ArticlePayload;
+import net.gogroups.blogservices.payload.request.UpdateArticlePayload;
 import net.gogroups.blogservices.repository.UserRepository;
 import net.gogroups.blogservices.service.serviceImpl.ArticleServiceImpl;
 import net.gogroups.blogservices.util.ArticleUpload;
 import net.gogroups.blogservices.util.SuccessResponse;
-import net.gogroups.blogservices.util.Util;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -23,12 +22,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Date;
 import java.util.List;
 
@@ -157,13 +154,22 @@ public class ArticleController {
         return new ResponseEntity<>(articleDtos, HttpStatus.OK);
     }
 
-    @GetMapping("protected/users/{userId}/articles/{articleId}")
-    @ApiOperation(value = "", authorizations = {
-            @Authorization(value = "jwtToken") })
+    @GetMapping("public/articles/preview/{articleId}")
     public ResponseEntity<Resource> previewFile(@PathVariable("articleId") String articleId,
-                                                 @PathVariable("userId") String userId,
                                                  HttpServletRequest request) throws IOException {
-        Resource resource = this.articleService.loadFileAsResource(articleId, userId);
+        Resource resource = this.articleService.loadFileAsResource(articleId);
+        String contentType;
+        contentType  = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+    }
+
+    @GetMapping("public/article-cover-pages/preview/{articleId}")
+    public ResponseEntity<Resource> previewFileCoverPage(@PathVariable("articleId") String articleId,
+                                                HttpServletRequest request) throws IOException {
+        Resource resource = this.articleService.loadArticleCoverPage(articleId);
         String contentType;
         contentType  = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
         return ResponseEntity.ok()
@@ -193,4 +199,8 @@ public class ArticleController {
         boolean hasBought = this.articleService.checkIfUserHasBoughtArticle(articleId, userId);
         return new ResponseEntity<>(hasBought, HttpStatus.OK);
     }
+
+
+
+
 }
