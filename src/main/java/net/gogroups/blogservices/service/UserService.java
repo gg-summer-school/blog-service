@@ -13,6 +13,8 @@ public interface UserService {
     User editUser(User user);
 
     Optional<User> loadUserDetails(String email);
+    
+    List<User> getAllUsers();
 	
 	List<User> getAllReaders();
 	
