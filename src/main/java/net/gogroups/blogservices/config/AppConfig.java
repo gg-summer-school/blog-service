@@ -1,6 +1,5 @@
 package net.gogroups.blogservices.config;
 
-import lombok.Getter;
 import net.gogroups.blogservices.exception.CustomIOException;
 import org.springframework.context.annotation.Configuration;
 

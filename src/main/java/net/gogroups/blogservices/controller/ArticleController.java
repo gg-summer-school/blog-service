@@ -154,11 +154,8 @@ public class ArticleController {
         return new ResponseEntity<>(articleDtos, HttpStatus.OK);
     }
 
-    @GetMapping("protected/articles/preview/{articleId}")
-    @ApiOperation(value = "", authorizations = {
-            @Authorization(value = "jwtToken") })
-    public ResponseEntity<Resource> previewFile(
-                                                @PathVariable("articleId") String articleId,
+    @GetMapping("public/articles/preview/{articleId}")
+    public ResponseEntity<Resource> previewFile(@PathVariable("articleId") String articleId,
                                                  HttpServletRequest request) throws IOException {
         Resource resource = this.articleService.loadFileAsResource(articleId);
         String contentType;
