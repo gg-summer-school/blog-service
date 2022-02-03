@@ -54,6 +54,11 @@ public class UserServiceImpl implements UserService {
 	public Optional<User> loadUserDetails(String email) {
 		return userRepository.findByEmail(email);
 	}
+	
+	@Override
+	public List<User> getAllUsers() {
+		return userRepository.findAll();
+	}
 
 	@Override
 	public List<User> getAllReaders() {
@@ -256,4 +261,6 @@ public class UserServiceImpl implements UserService {
 		}
 		return user.get();
 	}
+
+	
 }
