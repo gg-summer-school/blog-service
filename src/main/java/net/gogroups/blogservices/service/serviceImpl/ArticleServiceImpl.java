@@ -224,10 +224,11 @@ public class ArticleServiceImpl  implements ArticleService {
 
 
     @Override
-    public Resource loadFileAsResource(String articleId, String userId) {
+    public Resource loadFileAsResource(String articleId) {
         Path dirLocation;
         Optional<Article> downloadedArticle = this.articleRepository.findById(articleId);
         downloadedArticle.orElseThrow(() -> new ResourceNotFoundException("Article not found"));
+        String userId = this.util.getUserFromToken();
         if(!downloadedArticle.get().getUser().getId().equals(userId)){
             Optional<Transaction> getBoughtArticle = this.transactionRepository.findAll().
                     stream().
@@ -252,6 +253,29 @@ public class ArticleServiceImpl  implements ArticleService {
             throw new ResourceNotFoundException("Could not download file");
         }
 
+    }
+
+    @Override
+    public Resource loadArticleCoverPage(String articleId) {
+        Path dirLocation;
+        Optional<Article> downloadedArticle = this.articleRepository.findById(articleId);
+        downloadedArticle.orElseThrow(() -> new ResourceNotFoundException("Article not found"));
+        Category category = categoryRepository.findById(downloadedArticle.get().getCategory().getId()).get();
+        dirLocation =  Paths.get(AppConfig.FILEMAINDIRECTORY+"/"+AppConfig.ARTICLECOVERPAGEBASEDIRECTORY+"/"+category.getName()).
+                toAbsolutePath().normalize();
+        try {
+            Path file = dirLocation.resolve(downloadedArticle.get().getCoverPage()).normalize();
+            Resource resource = new UrlResource(file.toUri());
+            if (resource.exists() || resource.isReadable()) {
+                return resource;
+            }
+            else {
+                throw new ResourceNotFoundException("Could not find file");
+            }
+        }
+        catch (MalformedURLException e) {
+            throw new ResourceNotFoundException("Could not download file");
+        }
     }
 
     @Override

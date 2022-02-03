@@ -10,6 +10,7 @@ import net.gogroups.blogservices.exception.ResourceNotFoundException;
 import net.gogroups.blogservices.model.Article;
 import net.gogroups.blogservices.model.Contributor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,19 +35,30 @@ public class ArticleDto {
     private String  userId;
     private String categoryId;
     private String categoryName;
-    private String contentType;
+    private String coverPage;
+    private String document;
     private List<Contributor> contributors;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private byte[] coverPage;
+
 
 
 
     public ArticleDto convertArticleToArticleDto(Article article) {
         ArticleDto articleDto = new ArticleDto();
+        String fileDownloadUri = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/api/protected/articles/preview/")
+                .path(article.getId())
+                .toUriString();
+        String coverPageUrl = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/api/public/articles-cover-page/preview/")
+                .path(article.getId())
+                .toUriString();
         articleDto.setId(article.getId());
-        articleDto.setTitle(this.title = article.getTitle());
-        articleDto.setArticleAbstract(this.articleAbstract = article.getArticleAbstract());
+        articleDto.setTitle(article.getTitle());
+        articleDto.setArticleAbstract(article.getArticleAbstract());
         articleDto.setPrice(article.getPrice());
         articleDto.setToc(article.getToc());
         articleDto.setUserId(article.getUser().getId());
@@ -55,8 +67,8 @@ public class ArticleDto {
         articleDto.setContributors(article.getContributors());
         articleDto.setCreatedAt(article.getCreatedAt());
         articleDto.setUpdatedAt(article.getUpdatedAt());
-        articleDto.setContentType(this.getFileExtension(article.getCoverPage()));
-        articleDto.setCoverPage(this.getImageBytes(article));
+        articleDto.setDocument(fileDownloadUri);
+        articleDto.setCoverPage(coverPageUrl);
         return articleDto;
     }
 
@@ -67,24 +79,6 @@ public class ArticleDto {
     }
 
 
-    private  byte[] getImageBytes(Article article){
-        byte[] bytes;
-        File file = new File(AppConfig.FILEMAINDIRECTORY + "/" +AppConfig.ARTICLECOVERPAGEBASEDIRECTORY+ "/"+ article.getCategory().getName()+ "/" + article.getCoverPage());
-        try {
-            InputStream inputStream = new FileInputStream(file.getPath());
-            bytes = (inputStream.readAllBytes());
-        } catch (IOException e) {
-            throw new CustomIOException("Could not read file content");
-        }
-        return bytes;
-    }
-
-    private String getFileExtension(String coverPage) {
-        if(StringUtils.isBlank(coverPage)){
-            throw new ResourceNotFoundException("Article CoverPage not found");
-        }
-        return "image/"+coverPage.split("\\.")[1];
-    }
 
 
 }
