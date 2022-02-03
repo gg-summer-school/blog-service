@@ -12,6 +12,7 @@ import net.gogroups.blogservices.repository.CategoryRepository;
 import net.gogroups.blogservices.repository.TransactionRepository;
 import net.gogroups.blogservices.repository.UserRepository;
 import net.gogroups.blogservices.service.ArticleService;
+import net.gogroups.blogservices.service.UserService;
 import net.gogroups.blogservices.util.ArticleUpload;
 import net.gogroups.blogservices.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,6 +52,8 @@ public class ArticleServiceImpl  implements ArticleService {
     @Autowired
     ContributorServiceImpl contributorService;
     private final ArticleDto articleDto = new ArticleDto();
+    @Autowired
+    UserService userService;
 
 
 
@@ -225,10 +230,11 @@ public class ArticleServiceImpl  implements ArticleService {
 
     @Override
     public Resource loadFileAsResource(String articleId) {
+
         Path dirLocation;
         Optional<Article> downloadedArticle = this.articleRepository.findById(articleId);
         downloadedArticle.orElseThrow(() -> new ResourceNotFoundException("Article not found"));
-        String userId = this.util.getUserFromToken();
+        String userId = this.getUserFromToken();
         if(!downloadedArticle.get().getUser().getId().equals(userId)){
             Optional<Transaction> getBoughtArticle = this.transactionRepository.findAll().
                     stream().
@@ -252,6 +258,7 @@ public class ArticleServiceImpl  implements ArticleService {
         catch (MalformedURLException e) {
             throw new ResourceNotFoundException("Could not download file");
         }
+
 
     }
 
@@ -293,5 +300,13 @@ public class ArticleServiceImpl  implements ArticleService {
         return articles;
     }
 
-     
+    private String getUserFromToken(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Optional<User> user = userRepository.findByEmail(authentication.getName());
+        user.orElseThrow(() -> new UnAuthorizedException("Invalid Token"));
+        return user.get().getId();
+    }
+
+
+
 }
