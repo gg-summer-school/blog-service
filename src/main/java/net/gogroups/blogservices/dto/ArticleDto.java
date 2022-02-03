@@ -53,7 +53,7 @@ public class ArticleDto {
                 .toUriString();
         String coverPageUrl = ServletUriComponentsBuilder
                 .fromCurrentContextPath()
-                .path("/api/public/articles-cover-page/preview/")
+                .path("/api/public/article-cover-pages/preview/")
                 .path(article.getId())
                 .toUriString();
         articleDto.setId(article.getId());

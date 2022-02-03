@@ -157,7 +157,8 @@ public class ArticleController {
     @GetMapping("protected/articles/preview/{articleId}")
     @ApiOperation(value = "", authorizations = {
             @Authorization(value = "jwtToken") })
-    public ResponseEntity<Resource> previewFile(@PathVariable("articleId") String articleId,
+    public ResponseEntity<Resource> previewFile(
+                                                @PathVariable("articleId") String articleId,
                                                  HttpServletRequest request) throws IOException {
         Resource resource = this.articleService.loadFileAsResource(articleId);
         String contentType;
@@ -168,7 +169,7 @@ public class ArticleController {
                 .body(resource);
     }
 
-    @GetMapping("public/articles-cover-page/preview/{articleId}")
+    @GetMapping("public/article-cover-pages/preview/{articleId}")
     public ResponseEntity<Resource> previewFileCoverPage(@PathVariable("articleId") String articleId,
                                                 HttpServletRequest request) throws IOException {
         Resource resource = this.articleService.loadArticleCoverPage(articleId);
@@ -176,7 +177,6 @@ public class ArticleController {
         contentType  = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
-//                .header(HttpHeaders.X)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
     }
@@ -202,4 +202,8 @@ public class ArticleController {
         boolean hasBought = this.articleService.checkIfUserHasBoughtArticle(articleId, userId);
         return new ResponseEntity<>(hasBought, HttpStatus.OK);
     }
+
+
+
+
 }
