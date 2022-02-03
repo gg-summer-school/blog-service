@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,12 +45,11 @@ public class ArticleDto {
 
 
 
-    public ArticleDto convertArticleToArticleDto(Article article) {
+    public ArticleDto convertArticleToArticleDto(Article article, String... userId) {
         ArticleDto articleDto = new ArticleDto();
         String fileDownloadUri = ServletUriComponentsBuilder
                 .fromCurrentContextPath()
-                .path("/api/protected/articles/preview/")
-                .path(article.getId())
+                .path("/api/public/articles/preview/").path(article.getId())
                 .toUriString();
         String coverPageUrl = ServletUriComponentsBuilder
                 .fromCurrentContextPath()
