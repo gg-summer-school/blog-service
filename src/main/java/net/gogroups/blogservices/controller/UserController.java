@@ -222,12 +222,6 @@ public class UserController {
 		return new ResponseEntity<>(userDTOs, HttpStatus.OK);
 	}
 
-	@GetMapping("/publisher/articles")
-	public ResponseEntity<UserDTO> getPublisherByArticleId(@RequestParam String articleId) {
-		User user = userService.getPublisherByTheirArticleId(articleId);
-		UserDTO userDTO = this.modelMapper.map(user, UserDTO.class);
-		return new ResponseEntity<>(userDTO, HttpStatus.OK);
-	}
 
 	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("users/{publisher_id}")

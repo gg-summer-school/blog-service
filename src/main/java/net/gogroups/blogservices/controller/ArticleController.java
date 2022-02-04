@@ -5,10 +5,13 @@ import io.swagger.annotations.Authorization;
 import net.gogroups.blogservices.config.AppConfig;
 import net.gogroups.blogservices.dto.ArticleDto;
 import net.gogroups.blogservices.dto.ArticleResponse;
+import net.gogroups.blogservices.dto.UserDTO;
 import net.gogroups.blogservices.model.Article;
+import net.gogroups.blogservices.model.User;
 import net.gogroups.blogservices.payload.request.ArticlePayload;
 import net.gogroups.blogservices.payload.request.UpdateArticlePayload;
 import net.gogroups.blogservices.repository.UserRepository;
+import net.gogroups.blogservices.service.UserService;
 import net.gogroups.blogservices.service.serviceImpl.ArticleServiceImpl;
 import net.gogroups.blogservices.util.ArticleUpload;
 import net.gogroups.blogservices.util.SuccessResponse;
@@ -38,6 +41,8 @@ public class ArticleController {
     private ArticleServiceImpl articleService;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    UserService userService;
     @Autowired
     UserRepository userRepository;
     private final ArticleUpload articleUpload = new ArticleUpload();
@@ -200,7 +205,12 @@ public class ArticleController {
         return new ResponseEntity<>(hasBought, HttpStatus.OK);
     }
 
-
+    @GetMapping("/public/publisher/articles")
+    public ResponseEntity<UserDTO> getPublisherByArticleId(@RequestParam String articleId) {
+        User user = userService.getPublisherByTheirArticleId(articleId);
+        UserDTO userDTO = this.modelMapper.map(user, UserDTO.class);
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);
+    }
 
 
 }
