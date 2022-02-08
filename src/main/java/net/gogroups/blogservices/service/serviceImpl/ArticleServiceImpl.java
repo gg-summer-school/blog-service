@@ -12,7 +12,6 @@ import net.gogroups.blogservices.repository.CategoryRepository;
 import net.gogroups.blogservices.repository.TransactionRepository;
 import net.gogroups.blogservices.repository.UserRepository;
 import net.gogroups.blogservices.service.ArticleService;
-import net.gogroups.blogservices.service.UserService;
 import net.gogroups.blogservices.util.ArticleUpload;
 import net.gogroups.blogservices.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -55,6 +55,7 @@ public class ArticleServiceImpl  implements ArticleService {
 
 
     @Override
+    @Transactional
     public Article createArticle(Article article, String categoryId, String userId) {
         boolean isActive = this.checkIfUserIsActive(userId);
         User publisher = this.getUserById(userId);
@@ -174,6 +175,7 @@ public class ArticleServiceImpl  implements ArticleService {
     }
 
     @Override
+    @Transactional
     public void uploadArticleWithCoverPageImage(String articleId,  String publisherId, MultipartFile coverPage, MultipartFile document) {
         String articleCover = "coverPage";
         String doc = "article";
@@ -188,6 +190,7 @@ public class ArticleServiceImpl  implements ArticleService {
         articleRepository.save(article.get());
         this.articleUpload.uploadFile(category, articleCover, coverPage);
         this.articleUpload.uploadFile(category, doc, document);
+
     }
 
     @Override
