@@ -83,7 +83,7 @@ public class AuthController {
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getUserId());
 
         return ResponseEntity.ok(new JwtResponse(jwt, refreshToken.getToken(), userDetails.getUserId(),
-                userDetails.getName(),  userDetails.getEmail(), roles));
+                userDetails.getName(),  userDetails.getEmail(), userDetails.isApproved(), roles));
     }
 
     @ApiOperation(value = "For the refresh token")
@@ -117,7 +117,8 @@ public class AuthController {
                 signUpRequest.getName(),
                 encoder.encode(signUpRequest.getPassword()),
                 true,
-                false);
+                false,
+                signUpRequest.getReason());
 
         if(strRoles.equals("PUBLISHER")) {
             roles.add(roleRepository.findByRole(ERole.ROLE_READER));
