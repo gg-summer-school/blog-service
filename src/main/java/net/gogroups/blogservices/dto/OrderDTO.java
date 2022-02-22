@@ -17,7 +17,8 @@ import java.util.List;
 public class OrderDTO {
 
     private Long id;
-    private List<Article> articles = new ArrayList<>();
+    private List<ArticleDto> articles = new ArrayList<>();
+    private boolean status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

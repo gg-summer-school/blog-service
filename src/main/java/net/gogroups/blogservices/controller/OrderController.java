@@ -2,7 +2,9 @@ package net.gogroups.blogservices.controller;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
+import net.gogroups.blogservices.dto.ArticleDto;
 import net.gogroups.blogservices.dto.OrderDTO;
+import net.gogroups.blogservices.model.Article;
 import net.gogroups.blogservices.model.Order;
 import net.gogroups.blogservices.model.User;
 import net.gogroups.blogservices.payload.request.OrderPayload;
@@ -19,6 +21,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @CrossOrigin()
@@ -48,18 +53,37 @@ public class OrderController {
         if (orderDetails.isEmpty()) {
             return new ResponseEntity<>(new MessageResponse("No orders found!"), HttpStatus.OK);
         }else{
-            OrderDTO orderDTO = new OrderDTO(orderDetails.get().getId(), orderDetails.get().getArticles(),
-                    orderDetails.get().getCreatedAt(), orderDetails.get().getUpdatedAt());
+            List<Article> articles = orderDetails.get().getArticles();
+            List<ArticleDto> articleDto = this.modelMapper.map(articles, (Type) Article.class);
+            OrderDTO orderDTO = new OrderDTO(orderDetails.get().getId(), articleDto,
+                    false, orderDetails.get().getCreatedAt(), orderDetails.get().getUpdatedAt());
 
             return new ResponseEntity(orderDTO, HttpStatus.OK);
         }
     }
 
-//    @ApiOperation(value = "", authorizations = {
-//            @Authorization(value = "jwtToken")
-//    })
-//    @PostMapping("user/orders")
-//    public ResponseEntity<?> saveOrder(@Valid @RequestBody OrderPayload orderPayload){
-//
-//    }
+    @ApiOperation(value = "", authorizations = {
+            @Authorization(value = "jwtToken")
+    })
+    @PostMapping("user/orders/")
+    public ResponseEntity<?> saveUserOrder(@Valid @RequestBody OrderPayload orderPayload){
+        Order order = this.modelMapper.map(orderPayload, Order.class);
+        orderService.saveOrder(order);
+
+        return new ResponseEntity<>(new MessageResponse("Order Updated"), HttpStatus.CREATED);
+    }
+
+    @ApiOperation(value = "", authorizations = {
+            @Authorization(value = "jwtToken")
+    })
+    @PatchMapping("user/orders")
+    public ResponseEntity<?> updateUserOrder(@Valid @RequestBody OrderPayload orderPayload){
+        Order order = this.modelMapper.map(orderPayload, Order.class);
+        Optional<Order> editOrder = orderService.getOrderById(order.getId());
+
+        if(editOrder.isEmpty())
+            return new ResponseEntity<>(new MessageResponse("Order not found"), HttpStatus.NOT_FOUND);
+        else
+            return new ResponseEntity<>(orderService.saveOrder(editOrder.get()), HttpStatus.ACCEPTED);
+    }
 }

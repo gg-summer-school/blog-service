@@ -44,6 +44,7 @@ public class User {
     private List<Transaction> transactions;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     @JsonManagedReference
     private List<Order> orders;
 

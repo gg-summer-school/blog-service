@@ -19,7 +19,18 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order save(Order order) {
-        return null;
+    public Order saveOrder(Order order) {
+        return orderRepository.save(order);
     }
+
+    @Override
+    public Order editOrderById(Order order) {
+        return orderRepository.save(order);
+    }
+
+    @Override
+    public Optional<Order> getOrderById(Long id) {
+        return orderRepository.findById(id);
+    }
+
 }
