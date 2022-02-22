@@ -52,9 +52,10 @@ public class OrderController {
 
         if (orderDetails.isEmpty()) {
             return new ResponseEntity<>(new MessageResponse("No orders found!"), HttpStatus.OK);
-        }else{
+        } else {
             List<Article> articles = orderDetails.get().getArticles();
             List<ArticleDto> articleDto = this.modelMapper.map(articles, (Type) Article.class);
+
             OrderDTO orderDTO = new OrderDTO(orderDetails.get().getId(), articleDto,
                     false, orderDetails.get().getCreatedAt(), orderDetails.get().getUpdatedAt());
 
@@ -66,24 +67,11 @@ public class OrderController {
             @Authorization(value = "jwtToken")
     })
     @PostMapping("user/orders/")
-    public ResponseEntity<?> saveUserOrder(@Valid @RequestBody OrderPayload orderPayload){
+    public ResponseEntity<?> saveUserOrder(@Valid @RequestBody OrderPayload orderPayload) {
         Order order = this.modelMapper.map(orderPayload, Order.class);
         orderService.saveOrder(order);
 
         return new ResponseEntity<>(new MessageResponse("Order Updated"), HttpStatus.CREATED);
     }
 
-    @ApiOperation(value = "", authorizations = {
-            @Authorization(value = "jwtToken")
-    })
-    @PatchMapping("user/orders")
-    public ResponseEntity<?> updateUserOrder(@Valid @RequestBody OrderPayload orderPayload){
-        Order order = this.modelMapper.map(orderPayload, Order.class);
-        Optional<Order> editOrder = orderService.getOrderById(order.getId());
-
-        if(editOrder.isEmpty())
-            return new ResponseEntity<>(new MessageResponse("Order not found"), HttpStatus.NOT_FOUND);
-        else
-            return new ResponseEntity<>(orderService.saveOrder(editOrder.get()), HttpStatus.ACCEPTED);
-    }
 }
