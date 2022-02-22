@@ -8,8 +8,10 @@ import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class SignupRequest {
@@ -29,10 +31,9 @@ public class SignupRequest {
 	@NotNull
 	@Size(min = 8)
     private String password;
+	
+    @Size(min=3, message="Reason should have atleast 3 characters")
+    private String reason;
 
-    public SignupRequest(String email, String name, String password) {
-        this.email = email;
-        this.name = name;
-        this.password = password;
-    }
+
 }
