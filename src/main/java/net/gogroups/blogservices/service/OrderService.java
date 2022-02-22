@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface OrderService {
 
-    Optional<Order> getOrderDetails(String email);
+    Optional<Order> getOrders(String userId);
 
     Order save(Order order);
 }
