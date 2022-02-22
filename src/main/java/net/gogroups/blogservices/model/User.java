@@ -10,6 +10,7 @@ import lombok.Setter;
 import javax.persistence.*;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.Size;
 
 import java.util.List;
 
@@ -30,6 +31,10 @@ public class User {
     private String password;
     private boolean active;
     private boolean isApproved;
+    
+    @Column(columnDefinition = "LONGTEXT")
+    @Size(min=3, message="Reason should have atleast 3 characters")
+    private String reason;
 
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -52,13 +57,15 @@ public class User {
     @JsonManagedReference
     private List<Article> articles;
 
-    public User(String id, String email, String name, String password, boolean active, boolean isApproved) {
+    public User(String id, String email, String name, String password, 
+    		boolean active, boolean isApproved, String reason) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.active = active;
         this.isApproved = isApproved;
+        this.reason = reason;
     }
 
 }
