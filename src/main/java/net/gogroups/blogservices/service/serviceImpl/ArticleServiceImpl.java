@@ -290,8 +290,10 @@ public class ArticleServiceImpl  implements ArticleService {
         return articles;
     }
 
-
-
+    @Override
+    public List<Article> findAllArticlesById(List<String> articleId) {
+        return articleRepository.findAllById(articleId);
+    }
 
 
 }
