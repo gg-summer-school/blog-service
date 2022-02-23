@@ -52,13 +52,12 @@ public class OrderController {
 
         Optional<List<Order>> orderDetails = orderService.getOrders(user.get().getId());
 
-        if (orderDetails.isEmpty()) {
+        if (orderDetails.get().isEmpty())
             return new ResponseEntity<>(new MessageResponse("No orders found!"), HttpStatus.OK);
-        } else {
-
-
+        else if (user.isEmpty())
+            return new ResponseEntity<>(new MessageResponse("invalid user ID"), HttpStatus.UNAUTHORIZED);
+        else
             return new ResponseEntity(orderDetails, HttpStatus.OK);
-        }
     }
 
     @ApiOperation(value = "", authorizations = {
@@ -69,10 +68,16 @@ public class OrderController {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Optional<User> user = userService.loadUserDetails(userDetails.getUsername());
 
-        List<Article> articles = articleService.findAllArticlesById(orderPayload.getArticleIds());
-        OrderDTO orderDTO = new OrderDTO(articles, user.get().getId());
-        Order order = this.modelMapper.map(orderDTO, Order.class);
-        return new ResponseEntity<>(orderService.saveOrder(order), HttpStatus.CREATED);
+        if(!articleService.checkIfArticlesExist(orderPayload.getArticleIds()))
+            return new ResponseEntity<>(new MessageResponse("One or more article IDs are invalid"), HttpStatus.BAD_REQUEST);
+        else if(user.isEmpty())
+            return new ResponseEntity<>(new MessageResponse("Invalid user ID"), HttpStatus.UNAUTHORIZED);
+        else {
+            List<Article> articles = articleService.findAllArticlesById(orderPayload.getArticleIds());
+            OrderDTO orderDTO = new OrderDTO(articles, user.get().getId());
+            Order order = this.modelMapper.map(orderDTO, Order.class);
+            return new ResponseEntity<>(orderService.saveOrder(order), HttpStatus.CREATED);
+        }
     }
 
 }

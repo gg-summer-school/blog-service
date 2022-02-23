@@ -295,5 +295,17 @@ public class ArticleServiceImpl  implements ArticleService {
         return articleRepository.findAllById(articleId);
     }
 
+    @Override
+    public boolean checkIfArticlesExist(List<String> articleIds) {
+        for (String articleId:
+             articleIds) {
+            if(articleRepository.existsById(articleId))
+                continue;
+            else
+                return false;
+        }
+        return true;
+    }
+
 
 }
