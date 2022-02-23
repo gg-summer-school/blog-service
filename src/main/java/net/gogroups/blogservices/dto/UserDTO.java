@@ -17,5 +17,6 @@ public class UserDTO {
 	 private boolean active;
 	 private boolean isApproved;
 	 private List<Role> role;
+	 private String reason;
 
 }

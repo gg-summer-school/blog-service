@@ -31,10 +31,6 @@ public class User {
     private String password;
     private boolean active;
     private boolean isApproved;
-    
-    @Column(columnDefinition = "LONGTEXT")
-    @Size(min=3, message="Reason should have atleast 3 characters")
-    private String reason;
 
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -43,10 +39,19 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id",
                     referencedColumnName = "id"))
     private List<Role> role;
+    
+    @Column(columnDefinition = "LONGTEXT")
+    @Size(min=3, message="Reason should have atleast 3 characters")
+    private String reason;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Transaction> transactions;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    @JsonManagedReference
+    private List<Order> orders;
 
     @OneToMany(mappedBy = "user", cascade =  CascadeType.ALL)
     @JsonManagedReference

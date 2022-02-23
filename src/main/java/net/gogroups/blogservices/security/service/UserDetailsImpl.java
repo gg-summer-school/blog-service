@@ -26,20 +26,17 @@ public class UserDetailsImpl implements UserDetails {
     @JsonIgnore
     private String password;
     
-    private boolean isApproved;
-
     private Collection<? extends GrantedAuthority> authorities;
 
 
 
-    public UserDetailsImpl(String userId, String name,  String email, String password, Boolean isApproved,
+    public UserDetailsImpl(String userId, String name,  String email, String password,
                            Collection<? extends GrantedAuthority> authorities) {
         super();
         this.userId = userId;
         this.name = name;
         this.email = email;
         this.password = password;
-        this.isApproved = isApproved();
         this.authorities = authorities;
     }
 
@@ -53,7 +50,6 @@ public class UserDetailsImpl implements UserDetails {
                 user.getName(),
                 user.getEmail(),
                 user.getPassword(),
-                user.isApproved(),
                 authorities);
     }
 
