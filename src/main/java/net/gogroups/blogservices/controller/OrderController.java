@@ -9,6 +9,7 @@ import net.gogroups.blogservices.model.Order;
 import net.gogroups.blogservices.model.User;
 import net.gogroups.blogservices.payload.request.OrderPayload;
 import net.gogroups.blogservices.payload.response.MessageResponse;
+import net.gogroups.blogservices.service.ArticleService;
 import net.gogroups.blogservices.service.UserService;
 import net.gogroups.blogservices.service.serviceImpl.OrderServiceImpl;
 import org.modelmapper.ModelMapper;
@@ -21,8 +22,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,38 +39,40 @@ public class OrderController {
     @Autowired
     ModelMapper modelMapper;
 
+    @Autowired
+    ArticleService articleService;
+
     @ApiOperation(value = "", authorizations = {
-            @Authorization(value = "jwtToken")})
+            @Authorization(value = "jwtToken") })
     @GetMapping("user/orders/")
     public ResponseEntity<?> retrieveAllUserOrders() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Optional<User> user = userService.loadUserDetails(userDetails.getUsername());
 
-        Optional<Order> orderDetails = orderService.getOrders(user.get().getId());
+        Optional<List<Order>> orderDetails = orderService.getOrders(user.get().getId());
 
         if (orderDetails.isEmpty()) {
             return new ResponseEntity<>(new MessageResponse("No orders found!"), HttpStatus.OK);
         } else {
-            List<Article> articles = orderDetails.get().getArticles();
-            List<ArticleDto> articleDto = this.modelMapper.map(articles, (Type) Article.class);
 
-            OrderDTO orderDTO = new OrderDTO(orderDetails.get().getId(), articleDto,
-                    false, orderDetails.get().getCreatedAt(), orderDetails.get().getUpdatedAt());
 
-            return new ResponseEntity(orderDTO, HttpStatus.OK);
+            return new ResponseEntity(orderDetails, HttpStatus.OK);
         }
     }
 
     @ApiOperation(value = "", authorizations = {
-            @Authorization(value = "jwtToken")
-    })
+            @Authorization(value = "jwtToken") })
     @PostMapping("user/orders/")
     public ResponseEntity<?> saveUserOrder(@Valid @RequestBody OrderPayload orderPayload) {
-        Order order = this.modelMapper.map(orderPayload, Order.class);
-        orderService.saveOrder(order);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        Optional<User> user = userService.loadUserDetails(userDetails.getUsername());
 
-        return new ResponseEntity<>(new MessageResponse("Order Updated"), HttpStatus.CREATED);
+        List<Article> articles = articleService.findAllArticlesById(orderPayload.getArticleIds());
+        OrderDTO orderDTO = new OrderDTO(articles, user.get().getId());
+        Order order = this.modelMapper.map(orderDTO, Order.class);
+        return new ResponseEntity<>(orderService.saveOrder(order), HttpStatus.CREATED);
     }
 
 }
