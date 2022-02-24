@@ -54,9 +54,7 @@ public class Article extends  BaseEntity{
     @JsonIgnore
     private List<Transaction> transaction;
 
-    @JsonIgnore
-    @ManyToMany( cascade = CascadeType.ALL, mappedBy = "articles" )
-    private List<Order> orders;
+    
 
     @Transient
     public String getArticleImagePath() {

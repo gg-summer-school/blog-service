@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import net.gogroups.blogservices.model.Transaction;
 import net.gogroups.blogservices.model.User;
-
+import net.gogroups.blogservices.payload.request.TransactionPayload;
 import net.gogroups.blogservices.model.ERole;
 
 public interface UserService {
@@ -30,7 +30,7 @@ public interface UserService {
 	
 	void removeRole(String user_id, ERole role);
 	
-    Transaction payForArticle(String user_id, String article_id, Transaction transaction);
+    void payForArticle(String user_id, TransactionPayload payload);
 	
 	List<Transaction> getAllTransactionsOfAUser(String user_id);
 	

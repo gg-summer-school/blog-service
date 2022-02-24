@@ -48,11 +48,6 @@ public class User {
     @JsonManagedReference
     private List<Transaction> transactions;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @JsonIgnore
-    @JsonManagedReference
-    private List<Order> orders;
-
     @OneToMany(mappedBy = "user", cascade =  CascadeType.ALL)
     @JsonManagedReference
     private List<Article> articles;

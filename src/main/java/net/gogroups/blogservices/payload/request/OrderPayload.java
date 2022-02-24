@@ -1,18 +1,25 @@
 package net.gogroups.blogservices.payload.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
-@Data
-@AllArgsConstructor
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+
 @NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class OrderPayload {
-
-    @NotNull
-    private List<String> articleIds;
+	
+	@NotNull
+	private String articleIds;
+	
+	@NotNull
+	private String nameOfArticle;
 
 }

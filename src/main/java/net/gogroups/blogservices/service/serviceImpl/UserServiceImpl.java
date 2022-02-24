@@ -1,6 +1,8 @@
 package net.gogroups.blogservices.service.serviceImpl;
 
 import net.gogroups.blogservices.model.User;
+import net.gogroups.blogservices.payload.request.OrderPayload;
+import net.gogroups.blogservices.payload.request.TransactionPayload;
 import net.gogroups.blogservices.repository.UserRepository;
 import net.gogroups.blogservices.service.UserService;
 
@@ -150,34 +152,31 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Transaction payForArticle(String user_id, String article_id, Transaction transaction) {
+	public void payForArticle(String user_id, TransactionPayload payload) {
 		User user = checkingUserId(user_id);
 		String message = "User account has been suspended, you can't buy this article";
 		if(!user.isActive()) {
 			throw new ResourceNotFoundException(message);
 		}
-
-		Optional<Article> article = articleRepository.findById(article_id);
-		
-		Optional<Transaction> transaction_user = transactionRepository.findById(user_id);
-		Optional<Transaction> transaction_article = transactionRepository.findById(article_id);
-		
-		if(transaction_user.isPresent() &&  transaction_article.isPresent()) {
-			throw new ResourceAlreadyExistException("This article has been paid for already");
+		for(OrderPayload article1: payload.getArticles()) {
+			Transaction createdTransaction = new Transaction();
+			Optional<Article> article = articleRepository.findById(article1.getArticleIds());
+			article.orElseThrow(() -> new ResourceNotFoundException("Resource not found with id:"+article1.getArticleIds()));
+			Optional<Transaction> transaction = this.transactionRepository.findAll().
+					stream().
+					filter(tran -> tran.getUser().getId().equals(user_id) && tran.getArticle().getId().equals(article.get().getId())).
+					findFirst();
+			if(transaction.isEmpty()) {
+				createdTransaction.setId(util.generateId());
+				createdTransaction.setUser(user);
+				createdTransaction.setArticle(article.get());
+				createdTransaction.setNameOfArticle(article1.getNameOfArticle());
+				transactionRepository.save(createdTransaction);
+			}else { 
+				throw new ResourceAlreadyExistException("User already bought this article");
+			}
 		}
-
-		if (!user.isActive()) {
-			throw new ForbiddenException("User account is suspended");
-		}
 		
-		if (!article.isPresent()) {
-			throw new ResourceNotFoundException("Article not found with id- " + article_id);
-		}
-
-		transaction.setId(util.generateId());
-		transaction.setUser(user);
-		transaction.setArticle(article.get());
-		return transactionRepository.save(transaction);
 	}
 
 	@Override
