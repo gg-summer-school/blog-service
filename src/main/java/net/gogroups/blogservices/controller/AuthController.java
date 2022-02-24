@@ -17,6 +17,7 @@ import net.gogroups.blogservices.repository.RoleRepository;
 import net.gogroups.blogservices.repository.UserRepository;
 import net.gogroups.blogservices.security.service.RefreshTokenService;
 import net.gogroups.blogservices.security.service.UserDetailsImpl;
+import net.gogroups.blogservices.service.UserService;
 import net.gogroups.blogservices.security.jwt.JwtUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +36,7 @@ import javax.security.auth.login.AccountNotFoundException;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -56,6 +59,10 @@ public class AuthController {
 
     @Autowired
     JwtUtils jwtUtils;
+    
+    @Autowired
+	UserService userService;
+
 
     @Autowired
     RefreshTokenService refreshTokenService;
@@ -81,9 +88,12 @@ public class AuthController {
                 .collect(Collectors.toList());
 
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getUserId());
+        
+        UserDetails userDetails1 = (UserDetails) authentication.getPrincipal();
+        Optional<User> user = userService.loadUserDetails(userDetails1.getUsername());
 
         return ResponseEntity.ok(new JwtResponse(jwt, refreshToken.getToken(), userDetails.getUserId(),
-                userDetails.getName(),  userDetails.getEmail(), roles));
+                userDetails.getName(),  userDetails.getEmail(),roles,  user.get().isApproved()));
     }
 
     @ApiOperation(value = "For the refresh token")
@@ -117,7 +127,8 @@ public class AuthController {
                 signUpRequest.getName(),
                 encoder.encode(signUpRequest.getPassword()),
                 true,
-                false);
+                false,
+                signUpRequest.getReason());
 
         if(strRoles.equals("PUBLISHER")) {
             roles.add(roleRepository.findByRole(ERole.ROLE_READER));

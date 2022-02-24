@@ -1,5 +1,6 @@
 package net.gogroups.blogservices.payload.request;
 
+
 import java.math.BigDecimal;
 import javax.validation.constraints.NotNull;
 
