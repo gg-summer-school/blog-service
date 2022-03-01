@@ -41,7 +41,6 @@ public class User {
     private List<Role> role;
     
     @Column(columnDefinition = "LONGTEXT")
-    @Size(min=3, message="Reason should have atleast 3 characters")
     private String reason;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
