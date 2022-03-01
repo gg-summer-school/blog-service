@@ -32,7 +32,6 @@ public class SignupRequest {
 	@Size(min = 8)
     private String password;
 	
-    @Size(min=3, message="Reason should have atleast 3 characters")
     private String reason;
 
 
