@@ -168,15 +168,11 @@ public class UserController {
 	}
 
 	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER') or hasRole('ADMIN')")
-	@PostMapping("transactions/users/{user_id}/articles/{article_id}")
-	public ResponseEntity<?> payForArticleByUser(@PathVariable String user_id, @PathVariable String article_id,
+	@PostMapping("transactions/articles/users")
+	public ResponseEntity<SuccessResponse> payForArticleByUser(@RequestParam("userId") String userId,
 			@Valid @RequestBody TransactionPayload transactionPayload) {
-		Transaction transaction = modelMapper.map(transactionPayload, Transaction.class);
-		Transaction payForArticle = userService.payForArticle(user_id, article_id, transaction);
-
-		String message = payForArticle.getNameOfArticle() + " payed successfully " + "with Id " + payForArticle.getId();
-
-		return new ResponseEntity<>(new SuccessResponse(message, new Date(), ""), HttpStatus.CREATED);
+		this.userService.payForArticle(userId, transactionPayload);
+		return new ResponseEntity<>(new SuccessResponse("Transaction made successfully", new Date(), "success"), HttpStatus.CREATED);
 	}
 
 	@PreAuthorize("hasRole('READER') or hasRole('PUBLISHER')")

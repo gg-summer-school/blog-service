@@ -2,12 +2,10 @@ package net.gogroups.blogservices.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.gogroups.blogservices.repository.ArticleRepository;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -56,6 +54,7 @@ public class Article extends  BaseEntity{
     @JsonIgnore
     private List<Transaction> transaction;
 
+    
 
     @Transient
     public String getArticleImagePath() {

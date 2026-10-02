@@ -53,9 +53,13 @@ To check if java is installed use this command on the terminal (or command line 
     &emsp;&emsp;<code>java --version</code>
 </li>
 <li>Install a JAVA IDE. The IDE used for development is IntelliJ IDE(Community version)</li>
+  
+### <span id='installation'>Installation</span>
+  
 <li>Clone the project<br><br>
- &emsp;&emsp;<code>git clone https://github.com/gg-summer-school/blog-service.git</code><br><br>
-And navigate to the dev branch <br><br>
+ &emsp;&emsp;<code>git clone https://github.com/gg-summer-school/blog-service.git</code><br><br></li>
+<li>Open the project on your IDE and run it </li>
+<li>navigate to the dev branch <br><br>
  &emsp;&emsp;<code>git checkout branch dev</code><br><br>
 </li>
 </ul>

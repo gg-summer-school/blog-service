@@ -5,9 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,7 +16,14 @@ import java.math.BigDecimal;
 @Setter
 public class TransactionPayload {
 
+	
 	@NotNull
-    private String nameOfArticle;
+	@DecimalMin(value = "1.0")
+	private BigDecimal totalAmount;
+	
+	@NotNull
+	private List<OrderPayload> articles;
+	
+ 
 
 }

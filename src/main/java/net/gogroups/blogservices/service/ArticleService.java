@@ -26,5 +26,7 @@ public interface ArticleService {
     public Resource loadArticleCoverPage(String articleId);
     public List<Article> getArticlesByCategory(String categoryId);
     public List<Article> searchArticlesByYear(int year);
+    public List<Article> findAllArticlesById(List<String> articleId);
+    public boolean checkIfArticlesExist(List<String> articleId);
 
 }
